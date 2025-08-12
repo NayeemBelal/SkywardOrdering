@@ -1,0 +1,2011 @@
+[
+  {
+    "site": "FedEx Freight CH",
+    "supplies": [
+      {
+        "item_number": "ITEM",
+        "supply": "ITEM NUMBER"
+      },
+      {
+        "item_number": "Angle Broom - Each or Case",
+        "supply": "322768862"
+      },
+      {
+        "item_number": "Dust Mop Frame 24\"  - Each",
+        "supply": "REN02613-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 36\"  - Each",
+        "supply": "REN02615-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 60\"  - Each",
+        "supply": "REN02617-IB"
+      },
+      {
+        "item_number": "Dust Mop Handle - Each",
+        "supply": "RCPM1160000"
+      },
+      {
+        "item_number": "Dust Mop Head 24\"  - Case",
+        "supply": "REN02319-IB"
+      },
+      {
+        "item_number": "Dust Mop Head 36\"  - Case",
+        "supply": "REN02321_IB"
+      },
+      {
+        "item_number": "Dust Mop Head 60\" - Each",
+        "supply": "311954288"
+      },
+      {
+        "item_number": "Dust Pan - Each",
+        "supply": "REN05125"
+      },
+      {
+        "item_number": "Duster - Each or Case",
+        "supply": "328984865"
+      },
+      {
+        "item_number": "Duster Round",
+        "supply": "CSM36340414"
+      },
+      {
+        "item_number": "Gloves Large - Case of 10",
+        "supply": "TRANLG5201"
+      },
+      {
+        "item_number": "Gloves Medium - Case of 10",
+        "supply": "TRANMD5201BLU"
+      },
+      {
+        "item_number": "Gloves Xlarge - Case of 10",
+        "supply": "TRANXL5201BLU"
+      },
+      {
+        "item_number": "Ice Melt Remover",
+        "supply": "326444769"
+      },
+      {
+        "item_number": "Microfiber Cloth - Blue",
+        "supply": "309255847"
+      },
+      {
+        "item_number": "Microfiber Cloth - Green",
+        "supply": "309255848"
+      },
+      {
+        "item_number": "Microfiber Cloth - Red",
+        "supply": "309255861"
+      },
+      {
+        "item_number": "Microfiber Cloth - Yellow",
+        "supply": "309255863"
+      },
+      {
+        "item_number": "Mop Bucket w/wringer",
+        "supply": "APP15501"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt",
+        "supply": "PTE107313"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt Cylindrical",
+        "supply": "PTE100331"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 6qt",
+        "supply": "PTE107314"
+      },
+      {
+        "item_number": "Spartan Acid Bathroom & Shower Cleaner",
+        "supply": "SPA4724"
+      },
+      {
+        "item_number": "Spartan Clean by Peroxy",
+        "supply": "SPA4820"
+      },
+      {
+        "item_number": "Spartan ConsumeEco-Lyzer",
+        "supply": "SPA4597"
+      },
+      {
+        "item_number": "Spartan Sparclin Toilet Bowl Cleaner",
+        "supply": "SPA7118-12-C"
+      },
+      {
+        "item_number": "Spray Bottle Trigger",
+        "supply": "329717062"
+      },
+      {
+        "item_number": "Stainless Steel Cleaner",
+        "supply": "SPA6290"
+      },
+      {
+        "item_number": "Toilet Brush",
+        "supply": "311535529"
+      },
+      {
+        "item_number": "Wet Mop Handle",
+        "supply": "RCPH14600GY"
+      },
+      {
+        "item_number": "Wet Mop Large",
+        "supply": "324240440"
+      },
+      {
+        "item_number": "Wet Mop Medium",
+        "supply": "324240110"
+      }
+    ]
+  },
+  {
+    "site": "FedEx Freight Joliet",
+    "supplies": [
+      {
+        "item_number": "ITEM",
+        "supply": "ITEM NUMBER"
+      },
+      {
+        "item_number": "Angle Broom - Each or Case",
+        "supply": "322768862"
+      },
+      {
+        "item_number": "Dust Mop Frame 24\"  - Each",
+        "supply": "REN02613-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 36\"  - Each",
+        "supply": "REN02615-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 60\"  - Each",
+        "supply": "REN02617-IB"
+      },
+      {
+        "item_number": "Dust Mop Handle - Each",
+        "supply": "RCPM1160000"
+      },
+      {
+        "item_number": "Dust Mop Head 24\"  - Case",
+        "supply": "REN02319-IB"
+      },
+      {
+        "item_number": "Dust Mop Head 36\"  - Case",
+        "supply": "REN02321_IB"
+      },
+      {
+        "item_number": "Dust Mop Head 60\" - Each",
+        "supply": "311954288"
+      },
+      {
+        "item_number": "Dust Pan - Each",
+        "supply": "REN05125"
+      },
+      {
+        "item_number": "Duster - Each or Case",
+        "supply": "328984865"
+      },
+      {
+        "item_number": "Duster Round",
+        "supply": "CSM36340414"
+      },
+      {
+        "item_number": "Gloves Large - Box",
+        "supply": "TRANLG5201"
+      },
+      {
+        "item_number": "Gloves Medium - Box or Case",
+        "supply": "TRANMD5201BLU"
+      },
+      {
+        "item_number": "Gloves Xlarge - Box",
+        "supply": "TRANXL5201BLU"
+      },
+      {
+        "item_number": "Ice Melt Remover",
+        "supply": "326444769"
+      },
+      {
+        "item_number": "Microfiber Cloth - Blue",
+        "supply": "309255847"
+      },
+      {
+        "item_number": "Microfiber Cloth - Green",
+        "supply": "309255848"
+      },
+      {
+        "item_number": "Microfiber Cloth - Red",
+        "supply": "309255861"
+      },
+      {
+        "item_number": "Microfiber Cloth - Yellow",
+        "supply": "309255863"
+      },
+      {
+        "item_number": "Mop Bucket w/wringer",
+        "supply": "APP15501"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt",
+        "supply": "PTE107313"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt Cylindrical",
+        "supply": "PTE100331"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 6qt",
+        "supply": "PTE107314"
+      },
+      {
+        "item_number": "Spartan Acid Bathroom & Shower Cleaner",
+        "supply": "SPA4724"
+      },
+      {
+        "item_number": "Spartan Clean by Peroxy",
+        "supply": "SPA4820"
+      },
+      {
+        "item_number": "Spartan ConsumeEco-Lyzer",
+        "supply": "SPA4597"
+      },
+      {
+        "item_number": "Spartan Sparclin Toilet Bowl Cleaner",
+        "supply": "SPA7118-12-C"
+      },
+      {
+        "item_number": "Spray Bottle Trigger",
+        "supply": "329717062"
+      },
+      {
+        "item_number": "Stainless Steel Cleaner",
+        "supply": "SPA6290"
+      },
+      {
+        "item_number": "Toilet Brush",
+        "supply": "311535529"
+      },
+      {
+        "item_number": "Wet Mop Handle",
+        "supply": "RCPH14600GY"
+      },
+      {
+        "item_number": "Wet Mop Large",
+        "supply": "324240440"
+      },
+      {
+        "item_number": "Wet Mop Medium",
+        "supply": "324240110"
+      }
+    ]
+  },
+  {
+    "site": "FEDEX Pallets",
+    "supplies": [
+      {
+        "item_number": "ITEM",
+        "supply": "ITEM NUMBER"
+      },
+      {
+        "item_number": "Angle Broom - Each or Case",
+        "supply": "322768862"
+      },
+      {
+        "item_number": "Dust Mop Frame 24\"  - Each",
+        "supply": "REN02613-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 36\"  - Each",
+        "supply": "REN02615-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 60\"  - Each",
+        "supply": "REN02617-IB"
+      },
+      {
+        "item_number": "Dust Mop Handle - Each",
+        "supply": "RCPM1160000"
+      },
+      {
+        "item_number": "Dust Mop Head 24\"  - Case",
+        "supply": "REN02319-IB"
+      },
+      {
+        "item_number": "Dust Mop Head 36\"  - Case",
+        "supply": "REN02321_IB"
+      },
+      {
+        "item_number": "Dust Mop Head 60\" - Each",
+        "supply": "311954288"
+      },
+      {
+        "item_number": "Dust Pan - Each",
+        "supply": "REN05125"
+      },
+      {
+        "item_number": "Duster - Each or Case",
+        "supply": "328984865"
+      },
+      {
+        "item_number": "Duster Round",
+        "supply": "CSM36340414"
+      },
+      {
+        "item_number": "Gloves Large - Box",
+        "supply": "TRANLG5201"
+      },
+      {
+        "item_number": "Gloves Medium - Box or Case",
+        "supply": "TRANMD5201BLU"
+      },
+      {
+        "item_number": "Gloves Xlarge - Box",
+        "supply": "TRANXL5201BLU"
+      },
+      {
+        "item_number": "Ice Melt Remover",
+        "supply": "326444769"
+      },
+      {
+        "item_number": "Microfiber Cloth - Blue",
+        "supply": "309255847"
+      },
+      {
+        "item_number": "Microfiber Cloth - Green",
+        "supply": "309255848"
+      },
+      {
+        "item_number": "Microfiber Cloth - Red",
+        "supply": "309255861"
+      },
+      {
+        "item_number": "Microfiber Cloth - Yellow",
+        "supply": "309255863"
+      },
+      {
+        "item_number": "Mop Bucket w/wringer",
+        "supply": "APP15501"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt",
+        "supply": "PTE107313"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt Cylindrical",
+        "supply": "PTE100331"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 6qt",
+        "supply": "PTE107314"
+      },
+      {
+        "item_number": "Spartan Acid Bathroom & Shower Cleaner",
+        "supply": "SPA4724"
+      },
+      {
+        "item_number": "Spartan Clean by Peroxy",
+        "supply": "SPA4820"
+      },
+      {
+        "item_number": "Spartan ConsumeEco-Lyzer",
+        "supply": "SPA4597"
+      },
+      {
+        "item_number": "Spartan Sparclin Toilet Bowl Cleaner",
+        "supply": "SPA7118-12-C"
+      },
+      {
+        "item_number": "Spray Bottle Trigger",
+        "supply": "329717062"
+      },
+      {
+        "item_number": "Stainless Steel Cleaner",
+        "supply": "SPA6290"
+      },
+      {
+        "item_number": "Toilet Brush",
+        "supply": "311535529"
+      },
+      {
+        "item_number": "Wet Mop Handle",
+        "supply": "RCPH14600GY"
+      },
+      {
+        "item_number": "Wet Mop Large",
+        "supply": "324240440"
+      },
+      {
+        "item_number": "Wet Mop Medium",
+        "supply": "324240110"
+      }
+    ]
+  },
+  {
+    "site": "FEDEX GCS",
+    "supplies": [
+      {
+        "item_number": "ITEM",
+        "supply": "ITEM NUMBER"
+      },
+      {
+        "item_number": "Angle Broom - Each or Case",
+        "supply": "322768862"
+      },
+      {
+        "item_number": "Dust Mop Frame 24\"  - Each",
+        "supply": "REN02613-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 36\"  - Each",
+        "supply": "REN02615-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 60\"  - Each",
+        "supply": "REN02617-IB"
+      },
+      {
+        "item_number": "Dust Mop Handle - Each",
+        "supply": "RCPM1160000"
+      },
+      {
+        "item_number": "Dust Mop Head 24\"  - Case",
+        "supply": "REN02319-IB"
+      },
+      {
+        "item_number": "Dust Mop Head 36\"  - Case",
+        "supply": "REN02321_IB"
+      },
+      {
+        "item_number": "Dust Mop Head 60\" - Each",
+        "supply": "311954288"
+      },
+      {
+        "item_number": "Dust Pan - Each",
+        "supply": "REN05125"
+      },
+      {
+        "item_number": "Duster - Each or Case",
+        "supply": "328984865"
+      },
+      {
+        "item_number": "Duster Round",
+        "supply": "CSM36340414"
+      },
+      {
+        "item_number": "Gloves Large - Box",
+        "supply": "TRANLG5201"
+      },
+      {
+        "item_number": "Gloves Medium - Box or Case",
+        "supply": "TRANMD5201BLU"
+      },
+      {
+        "item_number": "Gloves Xlarge - Box",
+        "supply": "TRANXL5201BLU"
+      },
+      {
+        "item_number": "Ice Melt Remover",
+        "supply": "326444769"
+      },
+      {
+        "item_number": "Microfiber Cloth - Blue",
+        "supply": "309255847"
+      },
+      {
+        "item_number": "Microfiber Cloth - Green",
+        "supply": "309255848"
+      },
+      {
+        "item_number": "Microfiber Cloth - Red",
+        "supply": "309255861"
+      },
+      {
+        "item_number": "Microfiber Cloth - Yellow",
+        "supply": "309255863"
+      },
+      {
+        "item_number": "Mop Bucket w/wringer",
+        "supply": "APP15501"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt",
+        "supply": "PTE107313"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt Cylindrical",
+        "supply": "PTE100331"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 6qt",
+        "supply": "PTE107314"
+      },
+      {
+        "item_number": "Spartan Acid Bathroom & Shower Cleaner",
+        "supply": "SPA4724"
+      },
+      {
+        "item_number": "Spartan Clean by Peroxy",
+        "supply": "SPA4820"
+      },
+      {
+        "item_number": "Spartan ConsumeEco-Lyzer",
+        "supply": "SPA4597"
+      },
+      {
+        "item_number": "Spartan Sparclin Toilet Bowl Cleaner",
+        "supply": "SPA7118-12-C"
+      },
+      {
+        "item_number": "Spray Bottle Trigger",
+        "supply": "329717062"
+      },
+      {
+        "item_number": "Stainless Steel Cleaner",
+        "supply": "SPA6290"
+      },
+      {
+        "item_number": "Toilet Brush",
+        "supply": "311535529"
+      },
+      {
+        "item_number": "Wet Mop Handle",
+        "supply": "RCPH14600GY"
+      },
+      {
+        "item_number": "Wet Mop Large",
+        "supply": "324240440"
+      },
+      {
+        "item_number": "Wet Mop Medium",
+        "supply": "324240110"
+      }
+    ]
+  },
+  {
+    "site": "MANHEIM AUCTION BLDG",
+    "supplies": [
+      {
+        "item_number": "ITEM",
+        "supply": "ITEM NUMBER"
+      },
+      {
+        "item_number": "Angle Broom - Each or Case",
+        "supply": "322768862"
+      },
+      {
+        "item_number": "APPEAL FOAM HAND SOAP - CASE",
+        "supply": "APP17100-04"
+      },
+      {
+        "item_number": "BERRYPLASTICS CN LNR BLUE 15GAL - CASE",
+        "supply": "TYCCLBR2433HBL"
+      },
+      {
+        "item_number": "Dust Mop Frame 24\"  - Each",
+        "supply": "REN02613-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 36\"  - Each",
+        "supply": "REN02615-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 60\"  - Each",
+        "supply": "REN02617-IB"
+      },
+      {
+        "item_number": "Dust Mop Handle - Each",
+        "supply": "RCPM1160000"
+      },
+      {
+        "item_number": "Dust Mop Head 24\"  - Case",
+        "supply": "REN02319-IB"
+      },
+      {
+        "item_number": "Dust Mop Head 36\"  - Case",
+        "supply": "REN02321_IB"
+      },
+      {
+        "item_number": "Dust Mop Head 60\" - Each",
+        "supply": "311954288"
+      },
+      {
+        "item_number": "Dust Pan - Each",
+        "supply": "REN05125"
+      },
+      {
+        "item_number": "Duster - Each or Case",
+        "supply": "328984865"
+      },
+      {
+        "item_number": "Duster Round",
+        "supply": "CSM36340414"
+      },
+      {
+        "item_number": "Gloves Large - Box",
+        "supply": "TRANLG5201"
+      },
+      {
+        "item_number": "Gloves Medium - Box or Case",
+        "supply": "TRANMD5201BLU"
+      },
+      {
+        "item_number": "Gloves Xlarge - Box or Case",
+        "supply": "TRANXL5201BLU"
+      },
+      {
+        "item_number": "Ice Melt Remover - Each or Case",
+        "supply": "326444769"
+      },
+      {
+        "item_number": "Liquid Laundry Detergent - Each or Case",
+        "supply": "326211784"
+      },
+      {
+        "item_number": "Microfiber Cloth - Blue pack with 12",
+        "supply": "309255847"
+      },
+      {
+        "item_number": "Microfiber Cloth - Green pack with 12",
+        "supply": "309255848"
+      },
+      {
+        "item_number": "Microfiber Cloth - Red pack with 12",
+        "supply": "309255861"
+      },
+      {
+        "item_number": "Microfiber Cloth - Yellow with 12",
+        "supply": "309255863"
+      },
+      {
+        "item_number": "Mop Bucket w/wringer",
+        "supply": "APP15501"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt",
+        "supply": "PTE107313"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt Cylindrical",
+        "supply": "PTE100331"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 6qt",
+        "supply": "PTE107314"
+      },
+      {
+        "item_number": "REN TWL CONTRL HARD RL WHT CASE",
+        "supply": "REN06131-WB"
+      },
+      {
+        "item_number": "RENOWN CN LNR 38X58 60GAL BK - CASE",
+        "supply": "REN66016-CA"
+      },
+      {
+        "item_number": "RENOWN CN LNR BLUE 38X58 60GAL - CASE",
+        "supply": "REN56000-CL"
+      },
+      {
+        "item_number": "RENOWN FACIAL TISSUE - CASE",
+        "supply": "311540512"
+      },
+      {
+        "item_number": "RENOWN NC LNR 24X33 15GAL BK - CASE",
+        "supply": "REN21533-CA"
+      },
+      {
+        "item_number": "RENOWN PAPER KITCHEN TOWEL ROLLS - CASE",
+        "supply": "328548213"
+      },
+      {
+        "item_number": "RENOWN THRUCOUNTER FOAM HAND SOAP",
+        "supply": "311523651"
+      },
+      {
+        "item_number": "RENOWN TT CONTROLLED RL",
+        "supply": "REN06122-WB"
+      },
+      {
+        "item_number": "RENOWN WAVE3D URINAL SCRN - CASE",
+        "supply": "REN03123"
+      },
+      {
+        "item_number": "Spartan Acid Bathroom & Shower Cleaner",
+        "supply": "SPA4724"
+      },
+      {
+        "item_number": "Spartan Clean by Peroxy",
+        "supply": "SPA4820"
+      },
+      {
+        "item_number": "Spartan ConsumeEco-Lyzer",
+        "supply": "SPA4597"
+      },
+      {
+        "item_number": "Spartan Sparclin Toilet Bowl Cleaner",
+        "supply": "SPA7118-12-C"
+      },
+      {
+        "item_number": "Spray Bottle Trigger",
+        "supply": "329717062"
+      },
+      {
+        "item_number": "Stainless Steel Cleaner",
+        "supply": "SPA6290"
+      },
+      {
+        "item_number": "Toilet Brush",
+        "supply": "311535529"
+      },
+      {
+        "item_number": "URINAL MATS - CASE",
+        "supply": "SPA8600"
+      },
+      {
+        "item_number": "Wet Mop Handle",
+        "supply": "RCPH14600GY"
+      },
+      {
+        "item_number": "Wet Mop Large",
+        "supply": "324240440"
+      },
+      {
+        "item_number": "Wet Mop Medium",
+        "supply": "324240110"
+      }
+    ]
+  },
+  {
+    "site": "MANHEIM RECON BLDG",
+    "supplies": [
+      {
+        "item_number": "ITEM",
+        "supply": "ITEM NUMBER"
+      },
+      {
+        "item_number": "Angle Broom - Each or Case",
+        "supply": "322768862"
+      },
+      {
+        "item_number": "APPEAL FOAM HAND SOAP - CASE",
+        "supply": "APP17100-04"
+      },
+      {
+        "item_number": "BERRYPLASTICS CN LNR BLUE 15GAL - CASE",
+        "supply": "TYCCLBR2433HBL"
+      },
+      {
+        "item_number": "Dust Mop Frame 24\"  - Each",
+        "supply": "REN02613-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 36\"  - Each",
+        "supply": "REN02615-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 60\"  - Each",
+        "supply": "REN02617-IB"
+      },
+      {
+        "item_number": "Dust Mop Handle - Each",
+        "supply": "RCPM1160000"
+      },
+      {
+        "item_number": "Dust Mop Head 24\"  - Case",
+        "supply": "REN02319-IB"
+      },
+      {
+        "item_number": "Dust Mop Head 36\"  - Case",
+        "supply": "REN02321_IB"
+      },
+      {
+        "item_number": "Dust Mop Head 60\" - Each",
+        "supply": "311954288"
+      },
+      {
+        "item_number": "Dust Pan - Each",
+        "supply": "REN05125"
+      },
+      {
+        "item_number": "Duster - Each or Case",
+        "supply": "328984865"
+      },
+      {
+        "item_number": "Duster Round",
+        "supply": "CSM36340414"
+      },
+      {
+        "item_number": "Gloves Large - Box",
+        "supply": "TRANLG5201"
+      },
+      {
+        "item_number": "Gloves Medium - Box or Case",
+        "supply": "TRANMD5201BLU"
+      },
+      {
+        "item_number": "Gloves Xlarge - Box or Case",
+        "supply": "TRANXL5201BLU"
+      },
+      {
+        "item_number": "Ice Melt Remover - Each or Case",
+        "supply": "326444769"
+      },
+      {
+        "item_number": "Liquid Laundry Detergent - Each or Case",
+        "supply": "326211784"
+      },
+      {
+        "item_number": "Microfiber Cloth - Blue pack with 12",
+        "supply": "309255847"
+      },
+      {
+        "item_number": "Microfiber Cloth - Green pack with 12",
+        "supply": "309255848"
+      },
+      {
+        "item_number": "Microfiber Cloth - Red pack with 12",
+        "supply": "309255861"
+      },
+      {
+        "item_number": "Microfiber Cloth - Yellow with 12",
+        "supply": "309255863"
+      },
+      {
+        "item_number": "Mop Bucket w/wringer",
+        "supply": "APP15501"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt",
+        "supply": "PTE107313"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt Cylindrical",
+        "supply": "PTE100331"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 6qt",
+        "supply": "PTE107314"
+      },
+      {
+        "item_number": "REN SINGLE ROLL 2PLY TP - CASE",
+        "supply": "309116312"
+      },
+      {
+        "item_number": "REN TWL CONTRL HARD RL WHT NATL - CASE",
+        "supply": "REN06130-WB"
+      },
+      {
+        "item_number": "RENOWN CN LNR 38X58 60GAL BK - CASE",
+        "supply": "REN66016-CA"
+      },
+      {
+        "item_number": "RENOWN CN LNR BLUE 38X58 60GAL - CASE",
+        "supply": "REN56000-CL"
+      },
+      {
+        "item_number": "RENOWN NC LNR 24X33 15GAL BK - CASE",
+        "supply": "REN21533-CA"
+      },
+      {
+        "item_number": "RENOWN PAPER KITCHEN TOWEL ROLLS - CASE",
+        "supply": "328548213"
+      },
+      {
+        "item_number": "RENOWN TT CONTROLLED RL",
+        "supply": "REN06122-WB"
+      },
+      {
+        "item_number": "RENOWN WAVE3D URINAL SCRN - CASE",
+        "supply": "REN03123"
+      },
+      {
+        "item_number": "SANY+ GAL FOAMING HAND SOAP - CASE",
+        "supply": "306909925"
+      },
+      {
+        "item_number": "Spartan Acid Bathroom & Shower Cleaner",
+        "supply": "SPA4724"
+      },
+      {
+        "item_number": "Spartan Clean by Peroxy",
+        "supply": "SPA4820"
+      },
+      {
+        "item_number": "Spartan ConsumeEco-Lyzer",
+        "supply": "SPA4597"
+      },
+      {
+        "item_number": "SPARTAN SC200 DEGREASER 55GAL DRUM",
+        "supply": "SPA2200-55"
+      },
+      {
+        "item_number": "Spartan Sparclin Toilet Bowl Cleaner",
+        "supply": "SPA7118-12-C"
+      },
+      {
+        "item_number": "Spray Bottle Trigger",
+        "supply": "329717062"
+      },
+      {
+        "item_number": "Stainless Steel Cleaner",
+        "supply": "SPA6290"
+      },
+      {
+        "item_number": "Toilet Brush",
+        "supply": "311535529"
+      },
+      {
+        "item_number": "URINAL MATS - CASE",
+        "supply": "SPA8600"
+      },
+      {
+        "item_number": "Wet Mop Handle",
+        "supply": "RCPH14600GY"
+      },
+      {
+        "item_number": "Wet Mop Large",
+        "supply": "324240440"
+      },
+      {
+        "item_number": "Wet Mop Medium",
+        "supply": "324240110"
+      }
+    ]
+  },
+  {
+    "site": "SOUTH SUBURBAN ONCOLOGY",
+    "supplies": [
+      {
+        "item_number": "ITEM",
+        "supply": "ITEM NUMBER"
+      },
+      {
+        "item_number": "Angle Broom - Each or Case",
+        "supply": "322768862"
+      },
+      {
+        "item_number": "Dust Mop Frame 24\"  - Each",
+        "supply": "REN02613-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 36\"  - Each",
+        "supply": "REN02615-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 60\"  - Each",
+        "supply": "REN02617-IB"
+      },
+      {
+        "item_number": "Dust Mop Handle - Each",
+        "supply": "RCPM1160000"
+      },
+      {
+        "item_number": "Dust Mop Head 24\"  - Case",
+        "supply": "REN02319-IB"
+      },
+      {
+        "item_number": "Dust Mop Head 36\"  - Case",
+        "supply": "REN02321_IB"
+      },
+      {
+        "item_number": "Dust Mop Head 60\" - Each",
+        "supply": "311954288"
+      },
+      {
+        "item_number": "Dust Pan - Each",
+        "supply": "REN05125"
+      },
+      {
+        "item_number": "Duster - Each or Case",
+        "supply": "328984865"
+      },
+      {
+        "item_number": "Duster Round",
+        "supply": "CSM36340414"
+      },
+      {
+        "item_number": "Gloves Large - Box",
+        "supply": "TRANLG5201"
+      },
+      {
+        "item_number": "Gloves Medium - Box or Case",
+        "supply": "TRANMD5201BLU"
+      },
+      {
+        "item_number": "Gloves Xlarge - Box",
+        "supply": "TRANXL5201BLU"
+      },
+      {
+        "item_number": "Ice Melt Remover",
+        "supply": "326444769"
+      },
+      {
+        "item_number": "Microfiber Cloth - Blue",
+        "supply": "309255847"
+      },
+      {
+        "item_number": "Microfiber Cloth - Green",
+        "supply": "309255848"
+      },
+      {
+        "item_number": "Microfiber Cloth - Red",
+        "supply": "309255861"
+      },
+      {
+        "item_number": "Microfiber Cloth - Yellow",
+        "supply": "309255863"
+      },
+      {
+        "item_number": "Mop Bucket w/wringer",
+        "supply": "APP15501"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt",
+        "supply": "PTE107313"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt Cylindrical",
+        "supply": "PTE100331"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 6qt",
+        "supply": "PTE107314"
+      },
+      {
+        "item_number": "Spartan Acid Bathroom & Shower Cleaner",
+        "supply": "SPA4724"
+      },
+      {
+        "item_number": "Spartan Clean by Peroxy",
+        "supply": "SPA4820"
+      },
+      {
+        "item_number": "Spartan ConsumeEco-Lyzer",
+        "supply": "SPA4597"
+      },
+      {
+        "item_number": "Spartan Sparclin Toilet Bowl Cleaner",
+        "supply": "SPA7118-12-C"
+      },
+      {
+        "item_number": "Spray Bottle Trigger",
+        "supply": "329717062"
+      },
+      {
+        "item_number": "Stainless Steel Cleaner",
+        "supply": "SPA6290"
+      },
+      {
+        "item_number": "Toilet Brush",
+        "supply": "311535529"
+      },
+      {
+        "item_number": "Wet Mop Handle",
+        "supply": "RCPH14600GY"
+      },
+      {
+        "item_number": "Wet Mop Large",
+        "supply": "324240440"
+      },
+      {
+        "item_number": "Wet Mop Medium",
+        "supply": "324240110"
+      }
+    ]
+  },
+  {
+    "site": "Southland Oncology",
+    "supplies": [
+      {
+        "item_number": "ITEM",
+        "supply": "ITEM NUMBER"
+      },
+      {
+        "item_number": "Angle Broom - Each or Case",
+        "supply": "322768862"
+      },
+      {
+        "item_number": "APPEAL FOAM HAND SOAP - CASE",
+        "supply": "APP17201-04"
+      },
+      {
+        "item_number": "Dust Mop Frame 24\"  - Each",
+        "supply": "REN02613-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 36\"  - Each",
+        "supply": "REN02615-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 60\"  - Each",
+        "supply": "REN02617-IB"
+      },
+      {
+        "item_number": "Dust Mop Handle - Each",
+        "supply": "RCPM1160000"
+      },
+      {
+        "item_number": "Dust Mop Head 24\"  - Case",
+        "supply": "REN02319-IB"
+      },
+      {
+        "item_number": "Dust Mop Head 36\"  - Case",
+        "supply": "REN02321_IB"
+      },
+      {
+        "item_number": "Dust Mop Head 60\" - Each",
+        "supply": "311954288"
+      },
+      {
+        "item_number": "Dust Pan - Each",
+        "supply": "REN05125"
+      },
+      {
+        "item_number": "Duster - Each or Case",
+        "supply": "328984865"
+      },
+      {
+        "item_number": "Duster Round",
+        "supply": "CSM36340414"
+      },
+      {
+        "item_number": "Gloves Large - Box",
+        "supply": "TRANLG5201"
+      },
+      {
+        "item_number": "Gloves Medium - Box or Case",
+        "supply": "TRANMD5201BLU"
+      },
+      {
+        "item_number": "Gloves Xlarge - Box",
+        "supply": "TRANXL5201BLU"
+      },
+      {
+        "item_number": "Ice Melt Remover",
+        "supply": "326444769"
+      },
+      {
+        "item_number": "Microfiber Cloth - Blue",
+        "supply": "309255847"
+      },
+      {
+        "item_number": "Microfiber Cloth - Green",
+        "supply": "309255848"
+      },
+      {
+        "item_number": "Microfiber Cloth - Red",
+        "supply": "309255861"
+      },
+      {
+        "item_number": "Microfiber Cloth - Yellow",
+        "supply": "309255863"
+      },
+      {
+        "item_number": "Mop Bucket w/wringer",
+        "supply": "APP15501"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt",
+        "supply": "PTE107313"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt Cylindrical",
+        "supply": "PTE100331"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 6qt",
+        "supply": "PTE107314"
+      },
+      {
+        "item_number": "REN KITCHEN TWL ROLL - CASE",
+        "supply": "328548213"
+      },
+      {
+        "item_number": "RENOWN  HAND TWL M/F WHI - CASE",
+        "supply": "REN06002-WB"
+      },
+      {
+        "item_number": "RENOWN Toilet Paper Single Roll 2PLY-Case",
+        "supply": "309116312"
+      },
+      {
+        "item_number": "RENOWN Trash Liners 15gal. Black-Case",
+        "supply": "REN21533-CA"
+      },
+      {
+        "item_number": "RENOWN Trash Liners 60gal. Black-Case",
+        "supply": "REN66016-CA"
+      },
+      {
+        "item_number": "Spartan Acid Bathroom & Shower Cleaner",
+        "supply": "SPA4724"
+      },
+      {
+        "item_number": "Spartan Clean by Peroxy",
+        "supply": "SPA4820"
+      },
+      {
+        "item_number": "Spartan ConsumeEco-Lyzer",
+        "supply": "SPA4597"
+      },
+      {
+        "item_number": "Spartan Sparclin Toilet Bowl Cleaner",
+        "supply": "SPA7118-12-C"
+      },
+      {
+        "item_number": "Spray Bottle Trigger",
+        "supply": "329717062"
+      },
+      {
+        "item_number": "Stainless Steel Cleaner",
+        "supply": "SPA6290"
+      },
+      {
+        "item_number": "Toilet Brush",
+        "supply": "311535529"
+      },
+      {
+        "item_number": "Wet Mop Handle",
+        "supply": "RCPH14600GY"
+      },
+      {
+        "item_number": "Wet Mop Large",
+        "supply": "324240440"
+      },
+      {
+        "item_number": "Wet Mop Medium",
+        "supply": "324240110"
+      }
+    ]
+  },
+  {
+    "site": "HA International",
+    "supplies": [
+      {
+        "item_number": "ITEM",
+        "supply": "ITEM NUMBER"
+      },
+      {
+        "item_number": "Angle Broom - Each or Case",
+        "supply": "322768862"
+      },
+      {
+        "item_number": "Dust Mop Frame 24\"  - Each",
+        "supply": "REN02613-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 36\"  - Each",
+        "supply": "REN02615-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 60\"  - Each",
+        "supply": "REN02617-IB"
+      },
+      {
+        "item_number": "Dust Mop Handle - Each",
+        "supply": "RCPM1160000"
+      },
+      {
+        "item_number": "Dust Mop Head 24\"  - Case",
+        "supply": "REN02319-IB"
+      },
+      {
+        "item_number": "Dust Mop Head 36\"  - Case",
+        "supply": "REN02321_IB"
+      },
+      {
+        "item_number": "Dust Mop Head 60\" - Each",
+        "supply": "311954288"
+      },
+      {
+        "item_number": "Dust Pan - Each",
+        "supply": "REN05125"
+      },
+      {
+        "item_number": "Duster - Each or Case",
+        "supply": "328984865"
+      },
+      {
+        "item_number": "Duster Round",
+        "supply": "CSM36340414"
+      },
+      {
+        "item_number": "Gloves Large - Box",
+        "supply": "TRANLG5201"
+      },
+      {
+        "item_number": "Gloves Medium - Box or Case",
+        "supply": "TRANMD5201BLU"
+      },
+      {
+        "item_number": "Gloves Xlarge - Box",
+        "supply": "TRANXL5201BLU"
+      },
+      {
+        "item_number": "Ice Melt Remover",
+        "supply": "326444769"
+      },
+      {
+        "item_number": "Microfiber Cloth - Blue",
+        "supply": "309255847"
+      },
+      {
+        "item_number": "Microfiber Cloth - Green",
+        "supply": "309255848"
+      },
+      {
+        "item_number": "Microfiber Cloth - Red",
+        "supply": "309255861"
+      },
+      {
+        "item_number": "Microfiber Cloth - Yellow",
+        "supply": "309255863"
+      },
+      {
+        "item_number": "Mop Bucket w/wringer",
+        "supply": "APP15501"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt",
+        "supply": "PTE107313"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt Cylindrical",
+        "supply": "PTE100331"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 6qt",
+        "supply": "PTE107314"
+      },
+      {
+        "item_number": "Spartan Acid Bathroom & Shower Cleaner",
+        "supply": "SPA4724"
+      },
+      {
+        "item_number": "Spartan Clean by Peroxy",
+        "supply": "SPA4820"
+      },
+      {
+        "item_number": "Spartan ConsumeEco-Lyzer",
+        "supply": "SPA4597"
+      },
+      {
+        "item_number": "Spartan Sparclin Toilet Bowl Cleaner",
+        "supply": "SPA7118-12-C"
+      },
+      {
+        "item_number": "Spray Bottle Trigger",
+        "supply": "329717062"
+      },
+      {
+        "item_number": "Stainless Steel Cleaner",
+        "supply": "SPA6290"
+      },
+      {
+        "item_number": "Toilet Brush",
+        "supply": "311535529"
+      },
+      {
+        "item_number": "Wet Mop Handle",
+        "supply": "RCPH14600GY"
+      },
+      {
+        "item_number": "Wet Mop Large",
+        "supply": "324240440"
+      },
+      {
+        "item_number": "Wet Mop Medium",
+        "supply": "324240110"
+      }
+    ]
+  },
+  {
+    "site": "WQA",
+    "supplies": [
+      {
+        "item_number": "ITEM",
+        "supply": "ITEM NUMBER"
+      },
+      {
+        "item_number": "Angle Broom - Each or Case",
+        "supply": "322768862"
+      },
+      {
+        "item_number": "Dust Mop Frame 24\"  - Each",
+        "supply": "REN02613-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 36\"  - Each",
+        "supply": "REN02615-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 60\"  - Each",
+        "supply": "REN02617-IB"
+      },
+      {
+        "item_number": "Dust Mop Handle - Each",
+        "supply": "RCPM1160000"
+      },
+      {
+        "item_number": "Dust Mop Head 24\"  - Case",
+        "supply": "REN02319-IB"
+      },
+      {
+        "item_number": "Dust Mop Head 36\"  - Case",
+        "supply": "REN02321_IB"
+      },
+      {
+        "item_number": "Dust Mop Head 60\" - Each",
+        "supply": "311954288"
+      },
+      {
+        "item_number": "Dust Pan - Each",
+        "supply": "REN05125"
+      },
+      {
+        "item_number": "Duster - Each or Case",
+        "supply": "328984865"
+      },
+      {
+        "item_number": "Duster Round",
+        "supply": "CSM36340414"
+      },
+      {
+        "item_number": "Gloves Large - Box",
+        "supply": "TRANLG5201"
+      },
+      {
+        "item_number": "Gloves Medium - Box or Case",
+        "supply": "TRANMD5201BLU"
+      },
+      {
+        "item_number": "Gloves Xlarge - Box",
+        "supply": "TRANXL5201BLU"
+      },
+      {
+        "item_number": "Ice Melt Remover",
+        "supply": "326444769"
+      },
+      {
+        "item_number": "Microfiber Cloth - Blue",
+        "supply": "309255847"
+      },
+      {
+        "item_number": "Microfiber Cloth - Green",
+        "supply": "309255848"
+      },
+      {
+        "item_number": "Microfiber Cloth - Red",
+        "supply": "309255861"
+      },
+      {
+        "item_number": "Microfiber Cloth - Yellow",
+        "supply": "309255863"
+      },
+      {
+        "item_number": "Mop Bucket w/wringer",
+        "supply": "APP15501"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt",
+        "supply": "PTE107313"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt Cylindrical",
+        "supply": "PTE100331"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 6qt",
+        "supply": "PTE107314"
+      },
+      {
+        "item_number": "Spartan Acid Bathroom & Shower Cleaner",
+        "supply": "SPA4724"
+      },
+      {
+        "item_number": "Spartan Clean by Peroxy",
+        "supply": "SPA4820"
+      },
+      {
+        "item_number": "Spartan ConsumeEco-Lyzer",
+        "supply": "SPA4597"
+      },
+      {
+        "item_number": "Spartan Sparclin Toilet Bowl Cleaner",
+        "supply": "SPA7118-12-C"
+      },
+      {
+        "item_number": "Spray Bottle Trigger",
+        "supply": "329717062"
+      },
+      {
+        "item_number": "Stainless Steel Cleaner",
+        "supply": "SPA6290"
+      },
+      {
+        "item_number": "Toilet Brush",
+        "supply": "311535529"
+      },
+      {
+        "item_number": "Wet Mop Handle",
+        "supply": "RCPH14600GY"
+      },
+      {
+        "item_number": "Wet Mop Large",
+        "supply": "324240440"
+      },
+      {
+        "item_number": "Wet Mop Medium",
+        "supply": "324240110"
+      }
+    ]
+  },
+  {
+    "site": "American Technical Publishers",
+    "supplies": [
+      {
+        "item_number": "ITEM",
+        "supply": "ITEM NUMBER"
+      },
+      {
+        "item_number": "Angle Broom - Each or Case",
+        "supply": "322768862"
+      },
+      {
+        "item_number": "APPEAL FOAM HAND SOAP - CASE",
+        "supply": "APP17201-04"
+      },
+      {
+        "item_number": "CUP HOT 12OZ",
+        "supply": "DIX5342CD"
+      },
+      {
+        "item_number": "CUP HOT LID 12OZ",
+        "supply": "DIXD9542"
+      },
+      {
+        "item_number": "Dust Mop Frame 24\"  - Each",
+        "supply": "REN02613-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 36\"  - Each",
+        "supply": "REN02615-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 60\"  - Each",
+        "supply": "REN02617-IB"
+      },
+      {
+        "item_number": "Dust Mop Handle - Each",
+        "supply": "RCPM1160000"
+      },
+      {
+        "item_number": "Dust Mop Head 24\"  - Case",
+        "supply": "REN02319-IB"
+      },
+      {
+        "item_number": "Dust Mop Head 36\"  - Case",
+        "supply": "REN02321_IB"
+      },
+      {
+        "item_number": "Dust Mop Head 60\" - Each",
+        "supply": "311954288"
+      },
+      {
+        "item_number": "Dust Pan - Each",
+        "supply": "REN05125"
+      },
+      {
+        "item_number": "Duster - Each or Case",
+        "supply": "328984865"
+      },
+      {
+        "item_number": "Duster Round",
+        "supply": "CSM36340414"
+      },
+      {
+        "item_number": "Gloves Large - Box",
+        "supply": "TRANLG5201"
+      },
+      {
+        "item_number": "Gloves Medium - Box or Case",
+        "supply": "TRANMD5201BLU"
+      },
+      {
+        "item_number": "Gloves Xlarge - Box",
+        "supply": "TRANXL5201BLU"
+      },
+      {
+        "item_number": "Ice Melt Remover",
+        "supply": "326444769"
+      },
+      {
+        "item_number": "LID DOME 12-20OZ WHT",
+        "supply": "DIXD9542"
+      },
+      {
+        "item_number": "Microfiber Cloth - Blue",
+        "supply": "309255847"
+      },
+      {
+        "item_number": "Microfiber Cloth - Green",
+        "supply": "309255848"
+      },
+      {
+        "item_number": "Microfiber Cloth - Red",
+        "supply": "309255861"
+      },
+      {
+        "item_number": "Microfiber Cloth - Yellow",
+        "supply": "309255863"
+      },
+      {
+        "item_number": "Mop Bucket w/wringer",
+        "supply": "APP15501"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt",
+        "supply": "PTE107313"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt Cylindrical",
+        "supply": "PTE100331"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 6qt",
+        "supply": "PTE107314"
+      },
+      {
+        "item_number": "REN KITCHEN TWL ROLL - CASE",
+        "supply": "328548213"
+      },
+      {
+        "item_number": "RENOWN  HAND TWL M/F WHI - CASE",
+        "supply": "REN06002-WB"
+      },
+      {
+        "item_number": "RENOWN Toilet Paper Single Roll 2PLY-Case",
+        "supply": "309116312"
+      },
+      {
+        "item_number": "RENOWN Trash Liners 15gal. Black-Case",
+        "supply": "REN21533-CA"
+      },
+      {
+        "item_number": "RENOWN Trash Liners 20-30gal Black-Case",
+        "supply": "REN22505-CA"
+      },
+      {
+        "item_number": "RENOWN Trash Liners 60gal. Black-Case",
+        "supply": "REN66016-CA"
+      },
+      {
+        "item_number": "RENOWN Trash Liners 60gal. Natural-CasE",
+        "supply": "REN26018-CA"
+      },
+      {
+        "item_number": "Spartan Acid Bathroom & Shower Cleaner",
+        "supply": "SPA4724"
+      },
+      {
+        "item_number": "Spartan Clean by Peroxy",
+        "supply": "SPA4820"
+      },
+      {
+        "item_number": "Spartan ConsumeEco-Lyzer",
+        "supply": "SPA4597"
+      },
+      {
+        "item_number": "Spartan Sparclin Toilet Bowl Cleaner",
+        "supply": "SPA7118-12-C"
+      },
+      {
+        "item_number": "Spray Bottle Trigger",
+        "supply": "329717062"
+      },
+      {
+        "item_number": "Stainless Steel Cleaner",
+        "supply": "SPA6290"
+      },
+      {
+        "item_number": "Toilet Brush",
+        "supply": "311535529"
+      },
+      {
+        "item_number": "Wet Mop Handle",
+        "supply": "RCHP14600GY"
+      },
+      {
+        "item_number": "Wet Mop Large",
+        "supply": "324240440"
+      },
+      {
+        "item_number": "Wet Mop Medium",
+        "supply": "324240110"
+      }
+    ]
+  },
+  {
+    "site": "ELITE AMBULANCE",
+    "supplies": [
+      {
+        "item_number": "ITEM",
+        "supply": "ITEM NUMBER"
+      },
+      {
+        "item_number": "Angle Broom - Each or Case",
+        "supply": "322768862"
+      },
+      {
+        "item_number": "Dust Mop Frame 24\"  - Each",
+        "supply": "REN02613-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 36\"  - Each",
+        "supply": "REN02615-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 60\"  - Each",
+        "supply": "REN02617-IB"
+      },
+      {
+        "item_number": "Dust Mop Handle - Each",
+        "supply": "RCPM1160000"
+      },
+      {
+        "item_number": "Dust Mop Head 24\"  - Case",
+        "supply": "REN02319-IB"
+      },
+      {
+        "item_number": "Dust Mop Head 36\"  - Case",
+        "supply": "REN02321_IB"
+      },
+      {
+        "item_number": "Dust Mop Head 60\" - Each",
+        "supply": "311954288"
+      },
+      {
+        "item_number": "Dust Pan - Each",
+        "supply": "REN05125"
+      },
+      {
+        "item_number": "Duster - Each or Case",
+        "supply": "328984865"
+      },
+      {
+        "item_number": "Duster Round",
+        "supply": "CSM36340414"
+      },
+      {
+        "item_number": "Gloves Large - Box",
+        "supply": "TRANLG5201"
+      },
+      {
+        "item_number": "Gloves Medium - Box or Case",
+        "supply": "TRANMD5201BLU"
+      },
+      {
+        "item_number": "Gloves Xlarge - Box",
+        "supply": "TRANXL5201BLU"
+      },
+      {
+        "item_number": "Ice Melt Remover",
+        "supply": "326444769"
+      },
+      {
+        "item_number": "Microfiber Cloth - Blue",
+        "supply": "309255847"
+      },
+      {
+        "item_number": "Microfiber Cloth - Green",
+        "supply": "309255848"
+      },
+      {
+        "item_number": "Microfiber Cloth - Red",
+        "supply": "309255861"
+      },
+      {
+        "item_number": "Microfiber Cloth - Yellow",
+        "supply": "309255863"
+      },
+      {
+        "item_number": "Mop Bucket w/wringer",
+        "supply": "APP15501"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt",
+        "supply": "PTE107313"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt Cylindrical",
+        "supply": "PTE100331"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 6qt",
+        "supply": "PTE107314"
+      },
+      {
+        "item_number": "Spartan Acid Bathroom & Shower Cleaner",
+        "supply": "SPA4724"
+      },
+      {
+        "item_number": "Spartan Clean by Peroxy",
+        "supply": "SPA4820"
+      },
+      {
+        "item_number": "Spartan ConsumeEco-Lyzer",
+        "supply": "SPA4597"
+      },
+      {
+        "item_number": "Spartan Sparclin Toilet Bowl Cleaner",
+        "supply": "SPA7118-12-C"
+      },
+      {
+        "item_number": "Spray Bottle Trigger",
+        "supply": "329717062"
+      },
+      {
+        "item_number": "Stainless Steel Cleaner",
+        "supply": "SPA6290"
+      },
+      {
+        "item_number": "Toilet Brush",
+        "supply": "311535529"
+      },
+      {
+        "item_number": "Wet Mop Handle",
+        "supply": "RCPH14600GY"
+      },
+      {
+        "item_number": "Wet Mop Large",
+        "supply": "324240440"
+      },
+      {
+        "item_number": "Wet Mop Medium",
+        "supply": "324240110"
+      }
+    ]
+  },
+  {
+    "site": "Clean Earth Environmental Solutions",
+    "supplies": [
+      {
+        "item_number": "ITEM",
+        "supply": "ITEM NUMBER"
+      },
+      {
+        "item_number": "Angle Broom - Each or Case",
+        "supply": "322768862"
+      },
+      {
+        "item_number": "Dust Mop Frame 24\"  - Each",
+        "supply": "REN02613-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 36\"  - Each",
+        "supply": "REN02615-IB"
+      },
+      {
+        "item_number": "Dust Mop Frame 60\"  - Each",
+        "supply": "REN02617-IB"
+      },
+      {
+        "item_number": "Dust Mop Handle - Each",
+        "supply": "RCPM1160000"
+      },
+      {
+        "item_number": "Dust Mop Head 24\"  - Case",
+        "supply": "REN02319-IB"
+      },
+      {
+        "item_number": "Dust Mop Head 36\"  - Case",
+        "supply": "REN02321_IB"
+      },
+      {
+        "item_number": "Dust Mop Head 60\" - Each",
+        "supply": "311954288"
+      },
+      {
+        "item_number": "Dust Pan - Each",
+        "supply": "REN05125"
+      },
+      {
+        "item_number": "Duster - Each or Case",
+        "supply": "328984865"
+      },
+      {
+        "item_number": "Duster Round",
+        "supply": "CSM36340414"
+      },
+      {
+        "item_number": "Gloves Large - Box",
+        "supply": "TRANLG5201"
+      },
+      {
+        "item_number": "Gloves Medium - Box or Case",
+        "supply": "TRANMD5201BLU"
+      },
+      {
+        "item_number": "Gloves Xlarge - Box",
+        "supply": "TRANXL5201BLU"
+      },
+      {
+        "item_number": "Ice Melt Remover",
+        "supply": "326444769"
+      },
+      {
+        "item_number": "Microfiber Cloth - Blue",
+        "supply": "309255847"
+      },
+      {
+        "item_number": "Microfiber Cloth - Green",
+        "supply": "309255848"
+      },
+      {
+        "item_number": "Microfiber Cloth - Red",
+        "supply": "309255861"
+      },
+      {
+        "item_number": "Microfiber Cloth - Yellow",
+        "supply": "309255863"
+      },
+      {
+        "item_number": "Mop Bucket w/wringer",
+        "supply": "APP15501"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt",
+        "supply": "PTE107313"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 10qt Cylindrical",
+        "supply": "PTE100331"
+      },
+      {
+        "item_number": "Pro Team Vacuum Filter Bags 6qt",
+        "supply": "PTE107314"
+      },
+      {
+        "item_number": "Spartan Acid Bathroom & Shower Cleaner",
+        "supply": "SPA4724"
+      },
+      {
+        "item_number": "Spartan Clean by Peroxy",
+        "supply": "SPA4820"
+      },
+      {
+        "item_number": "Spartan ConsumeEco-Lyzer",
+        "supply": "SPA4597"
+      },
+      {
+        "item_number": "Spartan Sparclin Toilet Bowl Cleaner",
+        "supply": "SPA7118-12-C"
+      },
+      {
+        "item_number": "Spray Bottle Trigger",
+        "supply": "329717062"
+      },
+      {
+        "item_number": "Stainless Steel Cleaner",
+        "supply": "SPA6290"
+      },
+      {
+        "item_number": "Toilet Brush",
+        "supply": "311535529"
+      },
+      {
+        "item_number": "Wet Mop Handle",
+        "supply": "RCPH14600GY"
+      },
+      {
+        "item_number": "Wet Mop Large",
+        "supply": "324240440"
+      },
+      {
+        "item_number": "Wet Mop Medium",
+        "supply": "324240110"
+      }
+    ]
+  }
+]

@@ -1,42 +1,29 @@
-import { Admin, Resource, List, Datagrid, TextField, Edit, SimpleForm, TextInput } from 'react-admin';
-import dataProvider from './dataProvider';
-
-const SimpleList = (props:any) => (
-  <List {...props}>
-    <Datagrid rowClick="edit">
-      <TextField source="id" />
-      <TextField source="name" />
-    </Datagrid>
-  </List>
-);
-
-const RequestList = () => (
-  <List>
-    <Datagrid>
-      <TextField source="id" />
-      <TextField source="submitted_at" />
-      <TextField source="xlsx_path" />
-    </Datagrid>
-  </List>
-);
+import React from 'react';
+import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+import AdminDashboard from './AdminDashboard';
+import AddSite from './AddSite';
+import SiteDetail from './SiteDetail';
 
 export default function AdminApp() {
+  const navigate = useNavigate();
+  const [overlay, setOverlay] = React.useState(false);
   return (
-    <Admin dataProvider={dataProvider}>
-      <Resource name="sites" list={SimpleList} edit={()=>(
-        <Edit><SimpleForm><TextInput source="name" /></SimpleForm></Edit>
-      )} />
-      <Resource name="employees" list={props=>(
-        <List {...props}><Datagrid rowClick="edit"><TextField source="id" /><TextField source="full_name" /></Datagrid></List>
-      )} edit={()=>(
-        <Edit><SimpleForm><TextInput source="full_name" /></SimpleForm></Edit>
-      )} />
-      <Resource name="items" list={props=>(
-        <List {...props}><Datagrid rowClick="edit"><TextField source="id" /><TextField source="name_es" /><TextField source="sku" /></Datagrid></List>
-      )} edit={()=>(
-        <Edit><SimpleForm><TextInput source="name_es" /><TextInput source="name_en" /><TextInput source="sku" /></SimpleForm></Edit>
-      )} />
-      <Resource name="requests" list={RequestList} />
-    </Admin>
+    <div className="mx-auto max-w-5xl">
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-semibold">Admin</h1>
+        <div className="flex gap-2">
+          <Link to="/request" className="px-3 py-1 border rounded">Back to request</Link>
+          <button onClick={() => navigate('/admin')} className="px-3 py-1 border rounded">Dashboard</button>
+        </div>
+      </div>
+      {overlay && (
+        <div className="loading-overlay"><div className="spinner" /></div>
+      )}
+      <Routes>
+        <Route index element={<AdminDashboard />} />
+        <Route path="sites/new" element={<AddSite />} />
+        <Route path="sites/:siteId" element={<SiteDetail />} />
+      </Routes>
+    </div>
   );
 }
