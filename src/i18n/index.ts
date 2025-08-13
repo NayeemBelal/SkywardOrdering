@@ -70,6 +70,7 @@ const resources = {
       supplies: 'Supplies',
       'new employee name': 'New employee name',
       'no employees': 'No employees',
+      'uploading': 'Uploading...',
       'delete site': 'Delete site',
       
       // Success Page

@@ -8,14 +8,14 @@ export default function AddSite() {
   const navigate = useNavigate();
   const [name, setName] = React.useState('');
   const [employeesText, setEmployeesText] = React.useState('');
-  const [supplies, setSupplies] = React.useState<Array<{ name: string; sku: string }>>([
-    { name: '', sku: '' },
+  const [supplies, setSupplies] = React.useState<Array<{ name: string; sku: string; category: 'consumables' | 'supply' | 'equipment'; image?: File }>>([
+    { name: '', sku: '', category: 'supply' },
   ]);
   const [saving, setSaving] = React.useState(false);
   const [error, setError] = React.useState('');
 
-  const addSupplyRow = () => setSupplies(prev => [...prev, { name: '', sku: '' }]);
-  const updateSupply = (idx: number, field: 'name' | 'sku', value: string) => {
+  const addSupplyRow = () => setSupplies(prev => [...prev, { name: '', sku: '', category: 'supply' }]);
+  const updateSupply = (idx: number, field: 'name' | 'sku' | 'category' | 'image', value: string | File) => {
     setSupplies(prev => prev.map((r, i) => i === idx ? { ...r, [field]: value } : r));
   };
   const removeSupply = (idx: number) => setSupplies(prev => prev.filter((_, i) => i !== idx));
@@ -80,6 +80,28 @@ export default function AddSite() {
         const sku = row.sku.trim();
         const name = row.name.trim();
         if (!sku || !name) continue;
+        
+        let imagePath: string | undefined;
+        
+        // Upload image if provided
+        if (row.image) {
+          const fileName = `${sku}_${Date.now()}.${row.image.name.split('.').pop()}`;
+          const filePath = `uploads/${fileName}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('item-images')
+            .upload(filePath, row.image, {
+              upsert: true,
+              contentType: row.image.type
+            });
+          
+          if (uploadError) {
+            throw new Error(`Failed to upload image for ${sku}: ${uploadError.message}`);
+          }
+          
+          imagePath = `item-images/${filePath}`;
+        }
+        
         // find or create item by sku
         const { data: exists } = await supabase
           .from('app_items')
@@ -116,7 +138,11 @@ export default function AddSite() {
         }
         await supabase
           .from('app_site_items')
-          .upsert({ site_id: siteIdFinal, item_id: itemId }, { onConflict: 'site_id,item_id', ignoreDuplicates: true });
+          .upsert({ 
+            site_id: siteIdFinal, 
+            item_id: itemId,
+            image_path: imagePath
+          }, { onConflict: 'site_id,item_id', ignoreDuplicates: true });
       }
 
       navigate(`/admin/sites/${siteIdFinal}`);
@@ -145,20 +171,56 @@ export default function AddSite() {
           <button type="button" onClick={addSupplyRow} className="px-2 py-1 border rounded">{t('add row')}</button>
         </div>
         {supplies.map((row, idx) => (
-          <div key={idx} className="grid grid-cols-12 gap-2">
-            <input
-              className="col-span-6 border p-2 rounded"
-              placeholder={t('supply name')}
-              value={row.name}
-              onChange={e=>updateSupply(idx, 'name', e.target.value)}
-            />
-            <input
-              className="col-span-4 border p-2 rounded"
-              placeholder="SKU"
-              value={row.sku}
-              onChange={e=>updateSupply(idx, 'sku', e.target.value)}
-            />
-            <button type="button" onClick={()=>removeSupply(idx)} className="col-span-2 px-2 py-1 border rounded">{t('remove')}</button>
+          <div key={idx} className="space-y-3 p-4 border border-gray-200 rounded-lg">
+            <div className="grid grid-cols-12 gap-2">
+              <input
+                className="col-span-5 border p-2 rounded"
+                placeholder={t('supply name')}
+                value={row.name}
+                onChange={e=>updateSupply(idx, 'name', e.target.value)}
+              />
+              <input
+                className="col-span-3 border p-2 rounded"
+                placeholder="SKU"
+                value={row.sku}
+                onChange={e=>updateSupply(idx, 'sku', e.target.value)}
+              />
+              <select
+                className="col-span-2 border p-2 rounded"
+                value={row.category}
+                onChange={e=>updateSupply(idx, 'category', e.target.value as 'consumables' | 'supply' | 'equipment')}
+              >
+                <option value="consumables">{t('consumables')}</option>
+                <option value="supply">{t('supply')}</option>
+                <option value="equipment">{t('equipment')}</option>
+              </select>
+              <button type="button" onClick={()=>removeSupply(idx)} className="col-span-2 px-2 py-1 border rounded text-red-600 hover:bg-red-50">{t('remove')}</button>
+            </div>
+            
+            {/* Image Upload for this row */}
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium text-gray-700">📸 Upload Image (Optional)</h4>
+              <div className="flex items-center gap-3">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => updateSupply(idx, 'image', e.target.files?.[0] || null)}
+                  className="flex-1 border p-2 rounded text-sm"
+                />
+                {row.image && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-600">{row.image.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => updateSupply(idx, 'image', null)}
+                      className="px-2 py-1 text-red-600 text-sm border border-red-300 rounded hover:bg-red-50"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         ))}
       </div>

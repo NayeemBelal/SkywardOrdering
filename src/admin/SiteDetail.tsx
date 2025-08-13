@@ -22,6 +22,9 @@ export default function SiteDetail() {
   const [newEmployee, setNewEmployee] = React.useState('');
   const [newItemName, setNewItemName] = React.useState('');
   const [newItemSku, setNewItemSku] = React.useState('');
+  const [newItemCategory, setNewItemCategory] = React.useState<'consumables' | 'supply' | 'equipment'>('supply');
+  const [newItemImage, setNewItemImage] = React.useState<File | null>(null);
+  const [uploadingImage, setUploadingImage] = React.useState(false);
 
   React.useEffect(() => {
     let mounted = true;
@@ -91,25 +94,68 @@ export default function SiteDetail() {
     const sku = newItemSku.trim();
     const name = newItemName.trim();
     if (!sku || !name) return;
-    // find or create item by SKU
-    const { data: exists } = await supabase.from('app_items').select('id').eq('sku', sku).maybeSingle();
-    let itemId: number;
-    if (exists?.id) {
-      itemId = exists.id as number;
-      await supabase.from('app_items').update({ name }).eq('id', itemId);
-    } else {
-      const { data: created, error } = await supabase
-        .from('app_items')
-        .insert({ name, sku })
-        .select('id')
-        .single();
-      if (error) { setError(error.message); return; }
-      itemId = created!.id as number;
+
+    try {
+      setUploadingImage(true);
+      let imagePath: string | undefined;
+
+      // Upload image if provided
+      if (newItemImage) {
+        const fileName = `${sku}_${Date.now()}.${newItemImage.name.split('.').pop()}`;
+        const filePath = `uploads/${fileName}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('item-images')
+          .upload(filePath, newItemImage, {
+            upsert: true,
+            contentType: newItemImage.type
+          });
+        
+        if (uploadError) {
+          throw new Error(`Failed to upload image: ${uploadError.message}`);
+        }
+        
+        imagePath = `item-images/${filePath}`;
+      }
+
+      // find or create item by SKU
+      const { data: exists } = await supabase.from('app_items').select('id, category').eq('sku', sku).maybeSingle();
+      let itemId: number;
+      if (exists?.id) {
+        itemId = exists.id as number;
+        // Update name and category if they've changed
+        await supabase.from('app_items').update({ 
+          name, 
+          category: newItemCategory 
+        }).eq('id', itemId);
+      } else {
+        const { data: created, error } = await supabase
+          .from('app_items')
+          .insert({ name, sku, category: newItemCategory })
+          .select('id')
+          .single();
+        if (error) { setError(error.message); return; }
+        itemId = created!.id as number;
+      }
+
+      // Link item to site with image path
+      await supabase.from('app_site_items').upsert({ 
+        site_id: sid, 
+        item_id: itemId,
+        image_path: imagePath
+      }, { onConflict: 'site_id,item_id', ignoreDuplicates: true });
+
+      setItems(prev => [...prev, { id: itemId, name, sku, category: newItemCategory }]);
+      setNewItemName('');
+      setNewItemSku('');
+      setNewItemCategory('supply');
+      setNewItemImage(null);
+      
+    } catch (error: any) {
+      setError(error.message || 'Failed to add item');
+    } finally {
+      setUploadingImage(false);
     }
-    await supabase.from('app_site_items').upsert({ site_id: sid, item_id: itemId }, { onConflict: 'site_id,item_id', ignoreDuplicates: true });
-    setItems(prev => [...prev, { id: itemId, name, sku }]);
-    setNewItemName('');
-    setNewItemSku('');
   }
 
   async function removeItem(itemId: number) {
@@ -160,20 +206,61 @@ export default function SiteDetail() {
       {/* Supplies */}
       <section className="space-y-2">
         <h3 className="font-medium">{t('supplies')}</h3>
-        <div className="grid grid-cols-12 gap-2">
-          <input
-            className="col-span-6 border p-2 rounded"
-            placeholder={t('supply name')}
-            value={newItemName}
-            onChange={e=>setNewItemName(e.target.value)}
-          />
-          <input
-            className="col-span-4 border p-2 rounded"
-            placeholder="SKU"
-            value={newItemSku}
-            onChange={e=>setNewItemSku(e.target.value)}
-          />
-          <button onClick={addItem} className="col-span-2 px-3 py-1 border rounded">{t('add')}</button>
+        <div className="space-y-3">
+          <div className="grid grid-cols-12 gap-2">
+            <input
+              className="col-span-4 border p-2 rounded"
+              placeholder={t('supply name')}
+              value={newItemName}
+              onChange={e=>setNewItemName(e.target.value)}
+            />
+            <input
+              className="col-span-3 border p-2 rounded"
+              placeholder="SKU"
+              value={newItemSku}
+              onChange={e=>setNewItemSku(e.target.value)}
+            />
+            <select
+              className="col-span-3 border p-2 rounded"
+              value={newItemCategory}
+              onChange={e=>setNewItemCategory(e.target.value as 'consumables' | 'supply' | 'equipment')}
+            >
+              <option value="consumables">{t('consumables')}</option>
+              <option value="supply">{t('supply')}</option>
+              <option value="equipment">{t('equipment')}</option>
+            </select>
+            <button 
+              onClick={addItem} 
+              disabled={uploadingImage}
+              className="col-span-2 px-3 py-1 border rounded disabled:opacity-50"
+            >
+              {uploadingImage ? t('uploading') : t('add')}
+            </button>
+          </div>
+          
+          {/* Image Upload */}
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium text-gray-700">📸 Upload Image (Optional)</h4>
+            <div className="flex items-center gap-3">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setNewItemImage(e.target.files?.[0] || null)}
+                className="flex-1 border p-2 rounded text-sm"
+              />
+              {newItemImage && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600">{newItemImage.name}</span>
+                  <button
+                    onClick={() => setNewItemImage(null)}
+                    className="px-2 py-1 text-red-600 text-sm border border-red-300 rounded hover:bg-red-50"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
         <ul className="divide-y border rounded">
           {items.map(i => (
