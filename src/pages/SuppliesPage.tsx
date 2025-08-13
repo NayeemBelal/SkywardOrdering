@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import * as XLSX from 'xlsx';
+import { useTranslation } from 'react-i18next';
 
 interface Item { id: number; name: string; sku: string; category?: string; }
 
@@ -19,6 +20,8 @@ export default function SuppliesPage() {
   const [onHand, setOnHand] = useState<Record<number, number>>({});
   const [orderQty, setOrderQty] = useState<Record<number, number>>({});
   const [submitting, setSubmitting] = useState<boolean>(false);
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!siteId) return;
@@ -74,12 +77,12 @@ export default function SuppliesPage() {
   return (
     <div className="p-4 space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Supplies for: {siteName || 'Unknown Site'}</h1>
+        <h1 className="text-xl font-semibold">{t('supplies for')}: {siteName || t('unknown site')}</h1>
         <button
           className="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300"
           onClick={() => navigate(-1)}
         >
-          Back
+          {t('back')}
         </button>
       </div>
 
@@ -90,11 +93,11 @@ export default function SuppliesPage() {
       )}
 
       {items === null && !error && (
-        <div className="text-gray-600">Loading supplies…</div>
+        <div className="text-gray-600">{t('loading supplies')}</div>
       )}
 
       {items && siteItems.length === 0 && !error && (
-        <div className="p-4 bg-yellow-100 border border-yellow-300 text-yellow-800 rounded">No supplies found</div>
+        <div className="p-4 bg-yellow-100 border border-yellow-300 text-yellow-800 rounded">{t('no supplies found')}</div>
       )}
 
       {siteItems.length > 0 && (
@@ -106,7 +109,7 @@ export default function SuppliesPage() {
                 onClick={() => setActiveCat(k)}
                 className={`px-3 py-1 rounded border ${activeCat === k ? 'bg-blue-600 text-white' : 'bg-white'}`}
               >
-                {k === 'consumables' ? 'Consumables' : k === 'supply' ? 'Supply' : 'Equipment'} ({grouped[k]?.length || 0})
+                {k === 'consumables' ? t('consumables') : k === 'supply' ? t('supply') : t('equipment')} ({grouped[k]?.length || 0})
               </button>
             ))}
           </div>
@@ -114,10 +117,10 @@ export default function SuppliesPage() {
             <table className="min-w-full border border-gray-200 bg-white rounded">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="text-left px-4 py-2 border-b">Item</th>
-                  <th className="text-left px-4 py-2 border-b">SKU</th>
-                  <th className="text-left px-4 py-2 border-b">On Hand</th>
-                  <th className="text-left px-4 py-2 border-b">Order Qty</th>
+                  <th className="text-left px-4 py-2 border-b">{t('item')}</th>
+                  <th className="text-left px-4 py-2 border-b">{t('sku')}</th>
+                  <th className="text-left px-4 py-2 border-b">{t('on hand')}</th>
+                  <th className="text-left px-4 py-2 border-b">{t('order qty')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -172,7 +175,7 @@ export default function SuppliesPage() {
                 order_qty: Number.isFinite(orderQty[it.id]) ? orderQty[it.id] : '',
               }));
 
-              // Build XLSX workbook in browser
+              // Build XLSX workbook in browser (always English headers)
               const header = [
                 ['Site', siteName],
                 ['Employee', employeeName],
@@ -189,7 +192,7 @@ export default function SuppliesPage() {
               XLSX.utils.book_append_sheet(wb, ws, 'Request');
               const base64 = XLSX.write(wb, { type: 'base64', bookType: 'xlsx' });
 
-              // Send email via EmailJS REST API
+              // Send email via EmailJS REST API (always English template params)
               const emailPayload: any = {
                 service_id: import.meta.env.VITE_EMAILJS_SERVICE_ID || 'YOUR_EMAILJS_SERVICE_ID',
                 template_id: import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'YOUR_EMAILJS_TEMPLATE_ID',
@@ -234,7 +237,7 @@ export default function SuppliesPage() {
               const emailResult = await emailResponse.json();
               console.log('EmailJS result:', emailResult);
 
-              // Send Slack message via Incoming Webhook (client-side; may require CORS/no-cors)
+              // Send Slack message via Incoming Webhook (client-side; may require CORS/no-cors). Always English.
               const webhook = import.meta.env.VITE_SLACK_WEBHOOK_URL || '';
               if (webhook) {
                 const orderLines = rows.filter((r) => Number(r.order_qty) > 0);
@@ -262,7 +265,7 @@ export default function SuppliesPage() {
             }
           }}
         >
-          {submitting ? 'Submitting…' : 'Submit'}
+          {submitting ? t('submitting') : t('submit')}
         </button>
       </div>
     </div>
