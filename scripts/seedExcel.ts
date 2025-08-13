@@ -1,13 +1,19 @@
-import { readFile, utils } from 'xlsx';
+import { readFileSync } from 'fs';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.SUPABASE_URL!;
-const serviceKey = process.env.SUPABASE_SERVICE_ROLE!;
-const supabase = createClient(supabaseUrl, serviceKey);
+const SUPABASE_URL = process.env.SUPABASE_URL as string;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY as string;
+
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.error('Missing SUPABASE_URL or SUPABASE_ANON_KEY');
+  process.exit(1);
+}
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 (async () => {
   let siteCount=0, itemCount=0, empCount=0;
-  const supply = readFile('Supply List as of 7_31_25.xlsx');
+  const supply = readFileSync('Supply List as of 7_31_25.xlsx');
   for (const sheetName of supply.SheetNames) {
     const rows = utils.sheet_to_json<string[]>(supply.Sheets[sheetName], { header:1 });
     const headerIdx = rows.findIndex(r => r[0] === 'ITEM');
@@ -21,7 +27,7 @@ const supabase = createClient(supabaseUrl, serviceKey);
       await supabase.from('site_items').upsert({ site_id: site.id, item_id: item.id });
     }
   }
-  const staff = readFile('Job Site Staff.xlsx');
+  const staff = readFileSync('Job Site Staff.xlsx');
   const staffRows = utils.sheet_to_json<string[]>(staff.Sheets[staff.SheetNames[0]], { header:1 });
   for (const r of staffRows) {
     const cell = r[0];

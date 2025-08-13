@@ -2,18 +2,18 @@ import { google } from 'googleapis';
 import { createClient } from '@supabase/supabase-js';
 import path from 'path';
 
-const SUPABASE_URL = process.env.SUPABASE_URL!;
-const SUPABASE_SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE!;
-const DRIVE_FOLDER_ID = process.env.DRIVE_FOLDER_ID!; // 1NgeTatOd2raXjKHVTuWxZWlo0bvnXAK8
-const GOOGLE_CREDENTIALS_JSON = process.env.GOOGLE_CREDENTIALS_JSON!; // stringified service account JSON
+const SUPABASE_URL = process.env.SUPABASE_URL as string;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY as string;
+const DRIVE_FOLDER_ID = process.env.DRIVE_FOLDER_ID as string;
+const GOOGLE_CREDENTIALS_JSON = process.env.GOOGLE_CREDENTIALS_JSON as string;
 const BUCKET = process.env.SUPABASE_BUCKET || 'item-images';
 
-if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE || !DRIVE_FOLDER_ID || !GOOGLE_CREDENTIALS_JSON) {
-  console.error('Missing required env: SUPABASE_URL, SUPABASE_SERVICE_ROLE, DRIVE_FOLDER_ID, GOOGLE_CREDENTIALS_JSON');
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !DRIVE_FOLDER_ID || !GOOGLE_CREDENTIALS_JSON) {
+  console.error('Missing required env: SUPABASE_URL, SUPABASE_ANON_KEY, DRIVE_FOLDER_ID, GOOGLE_CREDENTIALS_JSON');
   process.exit(1);
 }
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE);
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const normalize = (s: string) => s.toUpperCase().replace(/[^A-Z0-9]+/g, ' ').trim();
 
 async function ensureBucket() {

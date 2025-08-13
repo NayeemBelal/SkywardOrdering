@@ -7,14 +7,14 @@ type SupplyRow = { item_number: string; supply: string };
 type SiteSuppliesEntry = { site: string; supplies: SupplyRow[] };
 
 const SUPABASE_URL = process.env.SUPABASE_URL as string;
-const SUPABASE_SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE as string;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY as string;
 
-if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE) {
-  console.error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE');
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.error('Missing SUPABASE_URL or SUPABASE_ANON_KEY');
   process.exit(1);
 }
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE);
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const normalize = (s: string) => s.toUpperCase().replace(/[^A-Z0-9]+/g, ' ').trim();
 
