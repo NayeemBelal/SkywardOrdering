@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { useTranslation } from 'react-i18next';
 
 type Site = { id: number; name: string };
 
 export default function AdminDashboard() {
+  const { t } = useTranslation();
   const [sites, setSites] = React.useState<Site[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string>('');
@@ -16,13 +18,7 @@ export default function AdminDashboard() {
         const { data, error } = await supabase.from('app_sites').select('id,name').order('name');
         if (error) throw error;
         if (!mounted) return;
-        // Hide duplicates client-side by normalized name
-        const uniqueByNorm = new Map<string, Site>();
-        (data || []).forEach((s: any) => {
-          const norm = String(s.name || '').trim().toLowerCase();
-          if (!uniqueByNorm.has(norm)) uniqueByNorm.set(norm, s as Site);
-        });
-        setSites(Array.from(uniqueByNorm.values()));
+        setSites((data || []) as Site[]);
       } catch (e: any) {
         setError(e.message || 'Failed to load sites');
       } finally {
@@ -37,10 +33,10 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Sites</h2>
-        <Link to="/admin/sites/new" className="px-3 py-1 bg-blue-600 text-white rounded">Add site</Link>
+        <h2 className="text-xl font-semibold">{t('sites')}</h2>
+        <Link to="/admin/sites/new" className="px-3 py-1 bg-blue-600 text-white rounded">{t('add site')}</Link>
       </div>
-      {loading && <div className="p-3">Loading…</div>}
+      {loading && <div>{t('loading')}</div>}
       {error && <div className="text-red-600">{error}</div>}
       <ul className="divide-y border rounded">
         {sites.map(s => (
@@ -49,7 +45,7 @@ export default function AdminDashboard() {
           </li>
         ))}
         {sites.length === 0 && !loading && (
-          <li className="p-3 text-gray-500">No sites yet</li>
+          <li className="p-3 text-gray-500">{t('no sites yet')}</li>
         )}
       </ul>
     </div>

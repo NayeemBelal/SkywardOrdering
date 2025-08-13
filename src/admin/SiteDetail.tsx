@@ -1,12 +1,14 @@
 import React from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { useTranslation } from 'react-i18next';
 
 type Employee = { id: number; full_name: string };
 type Item = { id: number; name: string; sku: string };
 type Site = { id: number; name: string };
 
 export default function SiteDetail() {
+  const { t } = useTranslation();
   const { siteId } = useParams();
   const navigate = useNavigate();
   const sid = Number(siteId);
@@ -124,44 +126,44 @@ export default function SiteDetail() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <Link to="/admin" className="text-blue-700">← Back</Link>
-          <h2 className="text-xl font-semibold">{site?.name || 'Site'}</h2>
+          <Link to="/admin" className="text-blue-700">← {t('back')}</Link>
+          <h2 className="text-xl font-semibold">{site?.name || t('site')}</h2>
         </div>
-        <button onClick={deleteSite} className="px-3 py-1 border rounded text-red-700">Delete site</button>
+        <button onClick={deleteSite} className="px-3 py-1 border rounded text-red-700">{t('delete site')}</button>
       </div>
-      {loading && <div className="p-3">Loading…</div>}
+      {loading && <div className="p-3">{t('loading')}</div>}
       {error && <div className="text-red-600">{error}</div>}
 
       {/* Employees */}
       <section className="space-y-2">
-        <h3 className="font-medium">Employees</h3>
+        <h3 className="font-medium">{t('employees')}</h3>
         <div className="flex gap-2">
           <input
             className="border p-2 rounded flex-1"
-            placeholder="New employee name"
+            placeholder={t('new employee name')}
             value={newEmployee}
             onChange={e=>setNewEmployee(e.target.value)}
           />
-          <button onClick={addEmployee} className="px-3 py-1 border rounded">Add</button>
+          <button onClick={addEmployee} className="px-3 py-1 border rounded">{t('add')}</button>
         </div>
         <ul className="divide-y border rounded">
           {employees.map(e => (
             <li key={e.id} className="p-2 flex items-center justify-between">
               <div>{e.full_name}</div>
-              <button onClick={()=>removeEmployee(e.id)} className="px-2 py-1 border rounded">Remove</button>
+              <button onClick={()=>removeEmployee(e.id)} className="px-2 py-1 border rounded">{t('remove')}</button>
             </li>
           ))}
-          {employees.length === 0 && <li className="p-2 text-gray-500">No employees</li>}
+          {employees.length === 0 && <li className="p-2 text-gray-500">{t('no employees')}</li>}
         </ul>
       </section>
 
       {/* Supplies */}
       <section className="space-y-2">
-        <h3 className="font-medium">Supplies</h3>
+        <h3 className="font-medium">{t('supplies')}</h3>
         <div className="grid grid-cols-12 gap-2">
           <input
             className="col-span-6 border p-2 rounded"
-            placeholder="Supply name"
+            placeholder={t('supply name')}
             value={newItemName}
             onChange={e=>setNewItemName(e.target.value)}
           />
@@ -171,7 +173,7 @@ export default function SiteDetail() {
             value={newItemSku}
             onChange={e=>setNewItemSku(e.target.value)}
           />
-          <button onClick={addItem} className="col-span-2 px-3 py-1 border rounded">Add</button>
+          <button onClick={addItem} className="col-span-2 px-3 py-1 border rounded">{t('add')}</button>
         </div>
         <ul className="divide-y border rounded">
           {items.map(i => (
@@ -179,11 +181,11 @@ export default function SiteDetail() {
               <div className="col-span-6">{i.name}</div>
               <div className="col-span-4 text-gray-600">{i.sku}</div>
               <div className="col-span-2 text-right">
-                <button onClick={()=>removeItem(i.id)} className="px-2 py-1 border rounded">Remove</button>
+                <button onClick={()=>removeItem(i.id)} className="px-2 py-1 border rounded">{t('remove')}</button>
               </div>
             </li>
           ))}
-          {items.length === 0 && <li className="p-2 text-gray-500">No supplies</li>}
+          {items.length === 0 && <li className="p-2 text-gray-500">{t('no supplies found')}</li>}
         </ul>
       </section>
     </div>

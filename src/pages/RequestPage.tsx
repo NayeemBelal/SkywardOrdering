@@ -156,10 +156,10 @@ export default function RequestPage() {
   if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
     return (
       <div className="text-center p-8">
-        <h2 className="text-xl font-bold mb-4">Configuration Required</h2>
-        <p className="mb-4">This app requires Supabase configuration to work properly.</p>
+        <h2 className="text-xl font-bold mb-4">{t('configuration required')}</h2>
+        <p className="mb-4">{t('missing env vars')}</p>
         <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
-          <p className="font-bold">Please create a .env file with:</p>
+          <p className="font-bold">{t('please create env file')}</p>
           <pre className="mt-2 text-sm">
             VITE_SUPABASE_URL=https://tmlhbsjpzszeodwxnjcl.supabase.co<br/>
             VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtbGhic2pwenN6ZW9kd3huamNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUwMTE1MTIsImV4cCI6MjA3MDU4NzUxMn0.baNVcOvLhlG-Gluu9yjaxt9j51EYW4hUiR-YbXOGfPM
@@ -175,20 +175,20 @@ export default function RequestPage() {
       <div className="flex justify-end gap-2">
         {checkingAuth ? null : session ? (
           <>
-            <button onClick={() => navigate('/admin')} className="px-3 py-1 border rounded">Admin</button>
-            <button onClick={logout} className="px-3 py-1 border rounded">Logout</button>
+            <button onClick={() => navigate('/admin')} className="px-3 py-1 border rounded">{t('admin')}</button>
+            <button onClick={logout} className="px-3 py-1 border rounded">{t('logout')}</button>
           </>
         ) : (
-          <button onClick={() => setShowLogin(true)} className="px-3 py-1 border rounded">Admin login</button>
+          <button onClick={() => setShowLogin(true)} className="px-3 py-1 border rounded">{t('admin login')}</button>
         )}
       </div>
 
       <select className="w-full border" value={siteId} onChange={e=>{ setSiteId(Number(e.target.value)); setEmployeeId(undefined); }}>
-        <option value="">Site</option>
+        <option value="">{t('site')}</option>
         {sites.map(s=> <option key={s.id} value={s.id}>{s.name}</option>)}
       </select>
       <select className="w-full border" value={employeeId} onChange={e=>setEmployeeId(Number(e.target.value))}>
-        <option value="">Employee</option>
+        <option value="">{t('employee')}</option>
         {employees.map(e=> <option key={e.id} value={e.id}>{e.full_name}</option>)}
       </select>
       <input
@@ -205,7 +205,7 @@ export default function RequestPage() {
       {showLogin && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
           <div className="bg-white rounded shadow p-4 w-full max-w-sm">
-            <h3 className="text-lg font-semibold mb-2">Admin Login</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('admin login')}</h3>
             <div className="space-y-2">
               <input
                 type="email"
@@ -225,9 +225,9 @@ export default function RequestPage() {
                 <div className="text-sm text-red-600">{authError}</div>
               )}
               <div className="flex justify-end gap-2 pt-2">
-                <button onClick={()=>setShowLogin(false)} className="px-3 py-1 border rounded">Cancel</button>
+                <button onClick={()=>setShowLogin(false)} className="px-3 py-1 border rounded">{t('cancel')}</button>
                 <button disabled={authLoading} onClick={login} className="px-3 py-1 bg-blue-600 text-white rounded disabled:bg-blue-300">
-                  {authLoading ? 'Signing in…' : 'Sign in'}
+                  {authLoading ? t('loading') : t('submit')}
                 </button>
               </div>
             </div>

@@ -1,8 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { useTranslation } from 'react-i18next';
 
 export default function AddSite() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [name, setName] = React.useState('');
   const [employeesText, setEmployeesText] = React.useState('');
@@ -76,8 +78,8 @@ export default function AddSite() {
       // 3) Upsert supplies: items + link to site
       for (const row of supplies) {
         const sku = row.sku.trim();
-        const itemName = row.name.trim();
-        if (!sku || !itemName) continue;
+        const name = row.name.trim();
+        if (!sku || !name) continue;
         // find or create item by sku
         const { data: exists } = await supabase
           .from('app_items')
@@ -88,12 +90,12 @@ export default function AddSite() {
         let category: 'consumables' | 'supply' | 'equipment' | undefined = exists?.category as any;
         if (!category) {
           // Heuristic category assignment based on name/sku
-          const text = `${itemName} ${sku}`.toLowerCase();
+          const text = `${name} ${sku}`.toLowerCase();
           if (/(vacuum|machine|auto\s?-?scrubber|burnisher|buffer|extractor|polisher|propane|battery|dispenser|bucket|cart|handle|frame)/.test(text)) {
             category = 'equipment';
           } else if (/(towel|tissue|toilet|bath|liner|bag|soap|sanitiz|wipe|napkin|roll|pad|refill|chemical|degreaser|glass|cleaner|disinfect|urinal|odor|fragrance|can liner|trash bag)/.test(text)) {
             category = 'consumables';
-          } else if (/(mop|broom|brush|duster|dustpan|squeegee|spray|bottle|caddy|holder|sign|cone|glove|goggles|scraper|sponge|mitt)/.test(text)) {
+          } else if (/(mop|broom|brush|duster|dust\s?pan|dustpan|squeegee|spray\s?bottle|bottle\b|caddy|holder|sign|wet\s?floor|cone\b|gloves?|goggles?|mask\b|scraper|sponges?|mitt|microfiber|cloth|rag|handle\b|frame\b|pad\s?holder|bucket\b|cart\b|wringer)/.test(text)) {
             category = 'supply';
           } else {
             category = 'supply';
@@ -102,11 +104,11 @@ export default function AddSite() {
         if (exists?.id) {
           itemId = exists.id as number;
           // ensure name and category up to date
-          await supabase.from('app_items').update({ name: itemName, category }).eq('id', itemId);
+          await supabase.from('app_items').update({ name: name, category }).eq('id', itemId);
         } else {
           const { data: created, error: itemErr } = await supabase
             .from('app_items')
-            .insert({ name: itemName, sku, category })
+            .insert({ name: name, sku, category })
             .select('id')
             .single();
           if (itemErr) throw itemErr;
@@ -127,26 +129,26 @@ export default function AddSite() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      <h2 className="text-xl font-semibold">Add site</h2>
+      <h2 className="text-xl font-semibold">{t('add site')}</h2>
       {error && <div className="text-red-600">{error}</div>}
       <div>
-        <label className="block text-sm font-medium mb-1">Site name</label>
+        <label className="block text-sm font-medium mb-1">{t('site name')}</label>
         <input value={name} onChange={e=>setName(e.target.value)} className="w-full border p-2 rounded" placeholder="e.g. Main Campus" required />
       </div>
       <div>
-        <label className="block text-sm font-medium mb-1">Employees (one per line)</label>
+        <label className="block text-sm font-medium mb-1">{t('employees one per line')}</label>
         <textarea value={employeesText} onChange={e=>setEmployeesText(e.target.value)} className="w-full border p-2 rounded h-32" placeholder="Jane Doe\nJohn Smith" />
       </div>
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium">Site supplies</label>
-          <button type="button" onClick={addSupplyRow} className="px-2 py-1 border rounded">Add row</button>
+          <label className="text-sm font-medium">{t('site supplies')}</label>
+          <button type="button" onClick={addSupplyRow} className="px-2 py-1 border rounded">{t('add row')}</button>
         </div>
         {supplies.map((row, idx) => (
           <div key={idx} className="grid grid-cols-12 gap-2">
             <input
               className="col-span-6 border p-2 rounded"
-              placeholder="Supply name"
+              placeholder={t('supply name')}
               value={row.name}
               onChange={e=>updateSupply(idx, 'name', e.target.value)}
             />
@@ -156,13 +158,13 @@ export default function AddSite() {
               value={row.sku}
               onChange={e=>updateSupply(idx, 'sku', e.target.value)}
             />
-            <button type="button" onClick={()=>removeSupply(idx)} className="col-span-2 px-2 py-1 border rounded">Remove</button>
+            <button type="button" onClick={()=>removeSupply(idx)} className="col-span-2 px-2 py-1 border rounded">{t('remove')}</button>
           </div>
         ))}
       </div>
       <div className="flex justify-end">
         <button type="submit" disabled={saving} className="px-4 py-2 bg-blue-600 text-white rounded disabled:bg-blue-300">
-          {saving ? 'Saving…' : 'Save site'}
+          {saving ? t('saving') : t('save site')}
         </button>
       </div>
     </form>
