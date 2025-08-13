@@ -192,69 +192,35 @@ export default function SuppliesPage() {
               XLSX.utils.book_append_sheet(wb, ws, 'Request');
               const base64 = XLSX.write(wb, { type: 'base64', bookType: 'xlsx' });
 
-              // Send email via EmailJS REST API (always English template params)
-              const emailPayload: any = {
-                service_id: import.meta.env.VITE_EMAILJS_SERVICE_ID || 'YOUR_EMAILJS_SERVICE_ID',
-                template_id: import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'YOUR_EMAILJS_TEMPLATE_ID',
-                user_id: import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'YOUR_EMAILJS_PUBLIC_KEY',
-                template_params: {
-                  site_name: siteName,
-                  employee_name: employeeName,
-                  submitted_at: new Date().toISOString(),
-                  to_email: import.meta.env.VITE_REQUESTS_TO_EMAIL || 'supervisor@example.com',
-                },
-                attachments: [
-                  { name: 'request.xlsx', data: base64 },
-                ],
-              };
+              // Send email via Supabase Edge Function with Resend
+              const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+              const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
               
-              // Add private key if available
-              if (import.meta.env.VITE_EMAILJS_PRIVATE_KEY) {
-                emailPayload.accessToken = import.meta.env.VITE_EMAILJS_PRIVATE_KEY;
+              if (!supabaseUrl || !supabaseAnonKey) {
+                throw new Error('Supabase configuration missing');
               }
               
-              console.log('EmailJS payload:', emailPayload);
-              console.log('EmailJS config:', {
-                service_id: import.meta.env.VITE_EMAILJS_SERVICE_ID,
-                template_id: import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-                user_id: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
-                has_private_key: !!import.meta.env.VITE_EMAILJS_PRIVATE_KEY,
-                to_email: import.meta.env.VITE_REQUESTS_TO_EMAIL,
-              });
-              
-              const emailResponse = await fetch(import.meta.env.VITE_EMAILJS_API_URL || 'https://api.emailjs.com/api/v1.0/email/send', {
+              const emailResponse = await fetch(`${supabaseUrl}/functions/v1/send-supply-request`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(emailPayload),
+                headers: { 
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${supabaseAnonKey}`
+                },
+                body: JSON.stringify({
+                  siteName,
+                  employeeName,
+                  items: rows
+                }),
               });
               
               if (!emailResponse.ok) {
                 const errorText = await emailResponse.text();
-                console.error('EmailJS error response:', errorText);
-                throw new Error(`EmailJS failed: ${emailResponse.status} ${errorText}`);
+                console.error('Edge Function error response:', errorText);
+                throw new Error(`Failed to send email: ${emailResponse.status} ${errorText}`);
               }
               
               const emailResult = await emailResponse.json();
-              console.log('EmailJS result:', emailResult);
-
-              // Send Slack message via Incoming Webhook (client-side; may require CORS/no-cors). Always English.
-              const webhook = import.meta.env.VITE_SLACK_WEBHOOK_URL || '';
-              if (webhook) {
-                const orderLines = rows.filter((r) => Number(r.order_qty) > 0);
-                const summary = orderLines
-                  .slice(0, 20)
-                  .map((r) => `• ${r.name} (${r.sku}) x ${r.order_qty}`)
-                  .join('\n');
-                const text = `New supply request\nSite: ${siteName}\nEmployee: ${employeeName}\nLines: ${orderLines.length}\n${summary}`;
-                try {
-                  await fetch(webhook, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    mode: 'no-cors',
-                    body: JSON.stringify({ text }),
-                  });
-                } catch {}
-              }
+              console.log('Email result:', emailResult);
 
               navigate('/success');
             } catch (e) {
