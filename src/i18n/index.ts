@@ -20,6 +20,7 @@ const resources = {
       item: 'Item',
       sku: 'SKU',
       category: 'Category',
+      image: 'Image',
       submitted: 'Submitted',
       lines: 'Lines',
       'new supply request': 'New supply request',

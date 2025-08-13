@@ -4,7 +4,13 @@ import { supabase } from '../lib/supabase';
 import * as XLSX from 'xlsx';
 import { useTranslation } from 'react-i18next';
 
-interface Item { id: number; name: string; sku: string; category?: string; }
+interface Item { 
+  id: number; 
+  name: string; 
+  sku: string; 
+  category?: string; 
+  image_path?: string; 
+}
 
 export default function SuppliesPage() {
   const navigate = useNavigate();
@@ -29,7 +35,7 @@ export default function SuppliesPage() {
     // Load items for the selected site from Supabase via app_site_items join
     supabase
       .from('app_site_items')
-      .select('app_items ( id, name, sku, category )')
+      .select('app_items ( id, name, sku, category ), image_path')
       .eq('site_id', siteId)
       .then((r) => {
         if (r.error) {
@@ -40,8 +46,11 @@ export default function SuppliesPage() {
         }
         const rows = (r.data as any[]) || [];
         console.log('[SuppliesPage] Raw item join rows', rows.slice(0, 5));
-        const list: Item[] = rows.map((row) => row.app_items).filter(Boolean);
-        console.log('[SuppliesPage] Items derived', list.length, list.slice(0, 5));
+        const list: Item[] = rows.map((row) => ({
+          ...row.app_items,
+          image_path: row.image_path
+        })).filter(Boolean);
+        console.log('[SuppliesPage] Items derived', list.length, list.slice(0,5));
         // Sort categories: Consumables, Supply, Equipment
         const order: Record<string, number> = { consumables: 0, supply: 1, equipment: 2 };
         list.sort((a, b) => {
@@ -72,6 +81,19 @@ export default function SuppliesPage() {
     if (v === '') return NaN;
     const n = Number(v);
     return Number.isFinite(n) && n >= 0 ? n : NaN;
+  };
+
+  // Helper to get image URL
+  const getImageUrl = (imagePath?: string) => {
+    if (!imagePath) {
+      // Return placeholder image URL
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      return `${supabaseUrl}/storage/v1/object/public/item-images/placeholders/img-placeholder.jpeg`;
+    }
+    
+    // Return actual image URL
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    return `${supabaseUrl}/storage/v1/object/public/${imagePath}`;
   };
 
   return (
@@ -113,10 +135,13 @@ export default function SuppliesPage() {
               </button>
             ))}
           </div>
-          <div className="overflow-x-auto">
+          
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="min-w-full border border-gray-200 bg-white rounded">
               <thead className="bg-gray-50">
                 <tr>
+                  <th className="text-left px-4 py-2 border-b">{t('image')}</th>
                   <th className="text-left px-4 py-2 border-b">{t('item')}</th>
                   <th className="text-left px-4 py-2 border-b">{t('sku')}</th>
                   <th className="text-left px-4 py-2 border-b">{t('on hand')}</th>
@@ -126,6 +151,18 @@ export default function SuppliesPage() {
               <tbody>
                 {(grouped[activeCat] || []).map((row) => (
                   <tr key={row.id} className="odd:bg-white even:bg-gray-50">
+                    <td className="px-4 py-2 border-b">
+                      <img 
+                        src={getImageUrl(row.image_path)} 
+                        alt={row.name}
+                        className="w-16 h-16 object-cover rounded border"
+                        onError={(e) => {
+                          // Fallback to placeholder if image fails to load
+                          const target = e.target as HTMLImageElement;
+                          target.src = getImageUrl();
+                        }}
+                      />
+                    </td>
                     <td className="px-4 py-2 border-b">{row.name}</td>
                     <td className="px-4 py-2 border-b font-mono">{row.sku}</td>
                     <td className="px-4 py-2 border-b">
@@ -156,6 +193,70 @@ export default function SuppliesPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile Card View */}
+          <div className="md:hidden space-y-4">
+            {(grouped[activeCat] || []).map((row) => (
+              <div key={row.id} className="bg-white border border-gray-200 rounded-lg p-4 space-y-3">
+                {/* Image */}
+                <div className="flex justify-center">
+                  <img 
+                    src={getImageUrl(row.image_path)} 
+                    alt={row.name}
+                    className="w-20 h-20 object-cover rounded border"
+                    onError={(e) => {
+                      // Fallback to placeholder if image fails to load
+                      const target = e.target as HTMLImageElement;
+                      target.src = getImageUrl();
+                    }}
+                  />
+                </div>
+                
+                {/* Item Name */}
+                <div className="text-center">
+                  <h3 className="font-medium text-gray-900">{row.name}</h3>
+                  <p className="text-sm text-gray-500 font-mono">{row.sku}</p>
+                </div>
+                
+                {/* Input Fields */}
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('on hand')}:
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-center"
+                      placeholder="0"
+                      value={Number.isFinite(onHand[row.id]) ? onHand[row.id] : ''}
+                      onChange={(e) => {
+                        const n = parseNum(e.target.value);
+                        setOnHand((prev) => ({ ...prev, [row.id]: Number.isNaN(n) ? NaN : n }));
+                      }}
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('order qty')}:
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-center"
+                      placeholder="0"
+                      value={Number.isFinite(orderQty[row.id]) ? orderQty[row.id] : ''}
+                      onChange={(e) => {
+                        const n = parseNum(e.target.value);
+                        setOrderQty((prev) => ({ ...prev, [row.id]: Number.isNaN(n) ? NaN : n }));
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </>
       )}

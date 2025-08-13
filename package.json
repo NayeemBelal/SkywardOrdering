@@ -8,6 +8,9 @@
     "seed": "ts-node scripts/seedExcel.ts",
     "seed:app": "ts-node scripts/seedApp.ts",
     "sync:images": "ts-node scripts/syncDriveImages.ts",
+    "sync:images:local": "ts-node scripts/syncLocalImages.ts",
+    "upload:placeholder": "ts-node scripts/uploadPlaceholder.ts",
+    "report:missing-images": "ts-node scripts/generateMissingImagesReport.ts",
     "supabase:start": "supabase start"
   },
   "dependencies": {
@@ -34,6 +37,7 @@
     "postcss": "^8.4.31",
     "tailwindcss": "^3.3.3",
     "ts-node": "^10.9.1",
+    "dotenv": "^16.4.5",
     "typescript": "^5.1.6",
     "vite": "^4.4.9"
   }
