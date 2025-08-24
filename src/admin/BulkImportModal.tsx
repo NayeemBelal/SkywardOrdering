@@ -606,13 +606,22 @@ export default function BulkImportModal({ isOpen, onClose, onImport, siteName }:
             {t('cancel')}
           </button>
           {step === 'preview' && (
-            <button
-              onClick={proceedToImages}
-              disabled={errors.length > 0}
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-green-300"
-            >
-              {t('next add images')}
-            </button>
+            <>
+              <button
+                onClick={() => handleImport()}
+                disabled={errors.length > 0}
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 disabled:bg-gray-100"
+              >
+                {t('skip images import only items')}
+              </button>
+              <button
+                onClick={proceedToImages}
+                disabled={errors.length > 0}
+                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-green-300"
+              >
+                {t('next add images')}
+              </button>
+            </>
           )}
           {step === 'images' && (
             <button

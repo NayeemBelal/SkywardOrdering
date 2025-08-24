@@ -121,6 +121,7 @@ const resources = {
       'file size': 'File Size',
       'no images selected': 'No images selected yet',
       'next add images': 'Next: Add Images',
+      'skip images import only items': 'Skip Images - Import Items Only',
       'import items and images': 'Import Items and Images',
       
       // Success Page
@@ -245,6 +246,7 @@ const resources = {
       'file size': 'Tamaño del Archivo',
       'no images selected': 'No se han seleccionado imágenes aún',
       'next add images': 'Siguiente: Agregar Imágenes',
+      'skip images import only items': 'Omitir Imágenes - Importar Solo Artículos',
       'import items and images': 'Importar Artículos e Imágenes',
       
       // Success Page
