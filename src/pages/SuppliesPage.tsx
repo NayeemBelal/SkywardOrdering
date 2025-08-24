@@ -4,6 +4,13 @@ import { supabase } from '../lib/supabase';
 import * as XLSX from 'xlsx';
 import { useTranslation } from 'react-i18next';
 
+interface CustomRequest {
+  id: string;
+  name: string;
+  onHand: number | '';
+  orderQty: number | '';
+}
+
 interface Item { 
   id: number; 
   name: string; 
@@ -25,6 +32,7 @@ export default function SuppliesPage() {
   // New: capture per-item inputs
   const [onHand, setOnHand] = useState<Record<number, number>>({});
   const [orderQty, setOrderQty] = useState<Record<number, number>>({});
+  const [customRequests, setCustomRequests] = useState<CustomRequest[]>([]);
   const [submitting, setSubmitting] = useState<boolean>(false);
 
   const { t } = useTranslation();
@@ -94,6 +102,27 @@ export default function SuppliesPage() {
     // Return actual image URL
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     return `${supabaseUrl}/storage/v1/object/public/${imagePath}`;
+  };
+
+  // Custom request handlers
+  const addCustomRequest = () => {
+    const newRequest: CustomRequest = {
+      id: Date.now().toString(),
+      name: '',
+      onHand: '',
+      orderQty: ''
+    };
+    setCustomRequests(prev => [...prev, newRequest]);
+  };
+
+  const removeCustomRequest = (id: string) => {
+    setCustomRequests(prev => prev.filter(req => req.id !== id));
+  };
+
+  const updateCustomRequest = (id: string, field: keyof CustomRequest, value: string | number) => {
+    setCustomRequests(prev => prev.map(req => 
+      req.id === id ? { ...req, [field]: value } : req
+    ));
   };
 
   return (
@@ -261,6 +290,161 @@ export default function SuppliesPage() {
         </>
       )}
 
+      {/* Custom Requests Section */}
+      <div className="bg-gray-50 rounded-lg p-4 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-900">{t('custom requests')}</h2>
+          <button
+            onClick={addCustomRequest}
+            className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            {t('add custom')}
+          </button>
+        </div>
+
+        {customRequests.length === 0 && (
+          <p className="text-gray-500 text-center py-4">{t('no custom requests')}</p>
+        )}
+
+        {/* Desktop Custom Requests Table */}
+        {customRequests.length > 0 && (
+          <div className="hidden md:block overflow-x-auto">
+            <table className="min-w-full border border-gray-200 bg-white rounded">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="text-left px-4 py-2 border-b">{t('item name')}</th>
+                  <th className="text-left px-4 py-2 border-b">{t('on hand')}</th>
+                  <th className="text-left px-4 py-2 border-b">{t('order qty')}</th>
+                  <th className="text-left px-4 py-2 border-b">{t('actions')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {customRequests.map((req) => (
+                  <tr key={req.id} className="odd:bg-white even:bg-gray-50">
+                    <td className="px-4 py-2 border-b">
+                      <input
+                        type="text"
+                        placeholder={t('enter item name')}
+                        className="w-full border rounded px-2 py-1"
+                        value={req.name}
+                        onChange={(e) => updateCustomRequest(req.id, 'name', e.target.value)}
+                      />
+                    </td>
+                    <td className="px-4 py-2 border-b">
+                      <input
+                        type="number"
+                        min={0}
+                        className="w-24 border rounded px-2 py-1"
+                        value={req.onHand}
+                        onChange={(e) => {
+                          const n = parseNum(e.target.value);
+                          updateCustomRequest(req.id, 'onHand', Number.isNaN(n) ? '' : n);
+                        }}
+                      />
+                    </td>
+                    <td className="px-4 py-2 border-b">
+                      <input
+                        type="number"
+                        min={0}
+                        className="w-24 border rounded px-2 py-1"
+                        value={req.orderQty}
+                        onChange={(e) => {
+                          const n = parseNum(e.target.value);
+                          updateCustomRequest(req.id, 'orderQty', Number.isNaN(n) ? '' : n);
+                        }}
+                      />
+                    </td>
+                    <td className="px-4 py-2 border-b">
+                      <button
+                        onClick={() => removeCustomRequest(req.id)}
+                        className="p-1 text-red-600 hover:text-red-800 transition-colors"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Mobile Custom Requests Cards */}
+        {customRequests.length > 0 && (
+          <div className="md:hidden space-y-4">
+            {customRequests.map((req) => (
+              <div key={req.id} className="bg-white border border-gray-200 rounded-lg p-4 space-y-3">
+                <div className="flex justify-between items-start">
+                  <h3 className="font-medium text-gray-900">{t('custom item')}</h3>
+                  <button
+                    onClick={() => removeCustomRequest(req.id)}
+                    className="p-1 text-red-600 hover:text-red-800 transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('item name')}:
+                  </label>
+                  <input
+                    type="text"
+                    placeholder={t('enter item name')}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+                    value={req.name}
+                    onChange={(e) => updateCustomRequest(req.id, 'name', e.target.value)}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('on hand')}:
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-center"
+                      placeholder="0"
+                      value={req.onHand}
+                      onChange={(e) => {
+                        const n = parseNum(e.target.value);
+                        updateCustomRequest(req.id, 'onHand', Number.isNaN(n) ? '' : n);
+                      }}
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('order qty')}:
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-center"
+                      placeholder="0"
+                      value={req.orderQty}
+                      onChange={(e) => {
+                        const n = parseNum(e.target.value);
+                        updateCustomRequest(req.id, 'orderQty', Number.isNaN(n) ? '' : n);
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       <div className="pt-4">
         <button
           className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 disabled:bg-blue-300"
@@ -276,6 +460,19 @@ export default function SuppliesPage() {
                 order_qty: Number.isFinite(orderQty[it.id]) ? orderQty[it.id] : '',
               }));
 
+              // Add custom requests to rows
+              const customRows = customRequests
+                .filter(req => req.name.trim()) // Only include requests with names
+                .map(req => ({
+                  category: 'Custom Orders',
+                  name: req.name.trim(),
+                  sku: 'CUSTOM',
+                  on_hand: typeof req.onHand === 'number' ? req.onHand : '',
+                  order_qty: typeof req.orderQty === 'number' ? req.orderQty : '',
+                }));
+
+              const allRows = [...rows, ...customRows];
+
               // Build XLSX workbook in browser (always English headers)
               const header = [
                 ['Site', siteName],
@@ -287,7 +484,7 @@ export default function SuppliesPage() {
               const ws = XLSX.utils.aoa_to_sheet([
                 ...header,
                 ...tableHeader,
-                ...rows.map((r) => [r.category, r.name, r.sku, r.on_hand, r.order_qty]),
+                ...allRows.map((r) => [r.category, r.name, r.sku, r.on_hand, r.order_qty]),
               ]);
               const wb = XLSX.utils.book_new();
               XLSX.utils.book_append_sheet(wb, ws, 'Request');
@@ -310,7 +507,7 @@ export default function SuppliesPage() {
                 body: JSON.stringify({
                   siteName,
                   employeeName,
-                  items: rows
+                  items: allRows
                 }),
               });
               

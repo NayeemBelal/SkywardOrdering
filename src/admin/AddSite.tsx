@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useTranslation } from 'react-i18next';
+import BulkImportModal from './BulkImportModal';
 
 export default function AddSite() {
   const { t } = useTranslation();
@@ -13,12 +14,46 @@ export default function AddSite() {
   ]);
   const [saving, setSaving] = React.useState(false);
   const [error, setError] = React.useState('');
+  const [showBulkImport, setShowBulkImport] = React.useState(false);
 
   const addSupplyRow = () => setSupplies(prev => [...prev, { name: '', sku: '', category: 'supply' }]);
-  const updateSupply = (idx: number, field: 'name' | 'sku' | 'category' | 'image', value: string | File) => {
+  const updateSupply = (idx: number, field: 'name' | 'sku' | 'category' | 'image', value: string | File | null) => {
     setSupplies(prev => prev.map((r, i) => i === idx ? { ...r, [field]: value } : r));
   };
   const removeSupply = (idx: number) => setSupplies(prev => prev.filter((_, i) => i !== idx));
+
+  const handleBulkImport = async (importRows: any[], imageFiles: any[]) => {
+    setError('');
+    
+    try {
+      // Convert import rows to supply format
+      const newSupplies = importRows.map(row => {
+        let category: 'consumables' | 'supply' | 'equipment';
+        if (row.type === 'consumable') category = 'consumables';
+        else if (row.type === 'equipment') category = 'equipment';
+        else category = 'supply';
+        
+        // Find matching image file for this SKU
+        const matchingImage = imageFiles.find(img => 
+          img.sku.toLowerCase() === row.itemSku.toLowerCase()
+        );
+        
+        return {
+          name: row.itemName,
+          sku: row.itemSku,
+          category,
+          image: matchingImage?.file
+        };
+      });
+      
+      // Replace existing supplies with imported ones
+      setSupplies(newSupplies);
+      
+    } catch (error: any) {
+      setError(`Bulk import failed: ${error.message}`);
+      throw error;
+    }
+  };
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -168,7 +203,16 @@ export default function AddSite() {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <label className="text-sm font-medium">{t('site supplies')}</label>
-          <button type="button" onClick={addSupplyRow} className="px-2 py-1 border rounded">{t('add row')}</button>
+          <div className="flex gap-2">
+            <button 
+              type="button" 
+              onClick={() => setShowBulkImport(true)}
+              className="px-2 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
+            >
+              📋 {t('bulk import')}
+            </button>
+            <button type="button" onClick={addSupplyRow} className="px-2 py-1 border rounded">{t('add row')}</button>
+          </div>
         </div>
         {supplies.map((row, idx) => (
           <div key={idx} className="space-y-3 p-4 border border-gray-200 rounded-lg">
@@ -204,7 +248,7 @@ export default function AddSite() {
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) => updateSupply(idx, 'image', e.target.files?.[0] || null)}
+                                        onChange={(e) => updateSupply(idx, 'image', e.target.files?.[0] || null)}
                   className="flex-1 border p-2 rounded text-sm"
                 />
                 {row.image && (
@@ -229,6 +273,13 @@ export default function AddSite() {
           {saving ? t('saving') : t('save site')}
         </button>
       </div>
+
+      <BulkImportModal
+        isOpen={showBulkImport}
+        onClose={() => setShowBulkImport(false)}
+        onImport={handleBulkImport}
+        siteName={name.trim() || undefined}
+      />
     </form>
   );
 }

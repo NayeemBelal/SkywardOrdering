@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useTranslation } from 'react-i18next';
+import BulkImportModal from './BulkImportModal';
 
 type Employee = { id: number; full_name: string };
 type Item = { id: number; name: string; sku: string };
@@ -25,6 +26,7 @@ export default function SiteDetail() {
   const [newItemCategory, setNewItemCategory] = React.useState<'consumables' | 'supply' | 'equipment'>('supply');
   const [newItemImage, setNewItemImage] = React.useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = React.useState(false);
+  const [showBulkImport, setShowBulkImport] = React.useState(false);
 
   React.useEffect(() => {
     let mounted = true;
@@ -168,6 +170,114 @@ export default function SiteDetail() {
     navigate('/admin');
   }
 
+  const handleBulkImport = async (importRows: any[], imageFiles: any[]) => {
+    setError('');
+    
+    try {
+      const itemIdMap = new Map<string, number>();
+      
+      // First, process all items
+      for (const row of importRows) {
+        const { itemSku: sku, itemName: name, type } = row;
+        
+        // Normalize type to match our schema
+        let category: 'consumables' | 'supply' | 'equipment';
+        if (type === 'consumable') category = 'consumables';
+        else if (type === 'equipment') category = 'equipment';
+        else category = 'supply';
+        
+        // Find or create item by SKU
+        const { data: exists } = await supabase
+          .from('app_items')
+          .select('id')
+          .eq('sku', sku)
+          .maybeSingle();
+          
+        let itemId: number;
+        if (exists?.id) {
+          itemId = exists.id as number;
+          // Update name and category
+          await supabase
+            .from('app_items')
+            .update({ name, category })
+            .eq('id', itemId);
+        } else {
+          const { data: created, error: itemErr } = await supabase
+            .from('app_items')
+            .insert({ name, sku, category })
+            .select('id')
+            .single();
+          if (itemErr) throw itemErr;
+          itemId = created!.id as number;
+        }
+        
+        itemIdMap.set(sku.toLowerCase(), itemId);
+        
+        // Link item to site (without image_path for now)
+        await supabase
+          .from('app_site_items')
+          .upsert({ 
+            site_id: sid, 
+            item_id: itemId
+          }, { onConflict: 'site_id,item_id', ignoreDuplicates: true });
+      }
+      
+      // Then, process images
+      for (const imageFile of imageFiles) {
+        try {
+          const itemId = itemIdMap.get(imageFile.sku.toLowerCase());
+          if (!itemId) continue;
+          
+          // Upload image to Supabase Storage
+          const fileName = `${imageFile.sku}_${Date.now()}.${imageFile.file.name.split('.').pop()}`;
+          const filePath = `uploads/${fileName}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('item-images')
+            .upload(filePath, imageFile.file, {
+              upsert: true,
+              contentType: imageFile.file.type
+            });
+          
+          if (uploadError) {
+            console.error(`Failed to upload image for ${imageFile.sku}:`, uploadError);
+            continue;
+          }
+          
+          // Update the site_items record with image path
+          await supabase
+            .from('app_site_items')
+            .update({ image_path: `item-images/${filePath}` })
+            .eq('site_id', sid)
+            .eq('item_id', itemId);
+            
+        } catch (error) {
+          console.error(`Error processing image ${imageFile.file.name}:`, error);
+        }
+      }
+      
+      // Refresh items list
+      const { data: itemRows } = await supabase
+        .from('app_site_items')
+        .select('app_items ( id, name, sku, category )')
+        .eq('site_id', sid);
+        
+      const order: Record<string, number> = { consumables: 0, supply: 1, equipment: 2 };
+      const arr = ((itemRows || []) as any[]).map(r => r.app_items).filter(Boolean) as any[];
+      arr.sort((a, b) => {
+        const ca = order[String(a.category || 'supply')];
+        const cb = order[String(b.category || 'supply')];
+        if (ca !== cb) return ca - cb;
+        return String(a.name || '').localeCompare(String(b.name || ''));
+      });
+      setItems(arr);
+      
+    } catch (error: any) {
+      setError(`Bulk import failed: ${error.message}`);
+      throw error;
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -175,7 +285,15 @@ export default function SiteDetail() {
           <Link to="/admin" className="text-blue-700">← {t('back')}</Link>
           <h2 className="text-xl font-semibold">{site?.name || t('site')}</h2>
         </div>
-        <button onClick={deleteSite} className="px-3 py-1 border rounded text-red-700">{t('delete site')}</button>
+        <div className="flex gap-2">
+          <button 
+            onClick={() => setShowBulkImport(true)}
+            className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+          >
+            📋 {t('bulk import')}
+          </button>
+          <button onClick={deleteSite} className="px-3 py-1 border rounded text-red-700">{t('delete site')}</button>
+        </div>
       </div>
       {loading && <div className="p-3">{t('loading')}</div>}
       {error && <div className="text-red-600">{error}</div>}
@@ -275,6 +393,13 @@ export default function SiteDetail() {
           {items.length === 0 && <li className="p-2 text-gray-500">{t('no supplies found')}</li>}
         </ul>
       </section>
+
+      <BulkImportModal
+        isOpen={showBulkImport}
+        onClose={() => setShowBulkImport(false)}
+        onImport={handleBulkImport}
+        siteName={site?.name}
+      />
     </div>
   );
 }
