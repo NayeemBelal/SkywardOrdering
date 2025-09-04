@@ -470,6 +470,7 @@ export default function SuppliesPage() {
                 category: (it.category as string) || '',
                 name: it.name,
                 sku: it.sku,
+                par: it.par,
                 on_hand: Number.isFinite(onHand[it.id]) ? onHand[it.id] : '',
                 order_qty: Number.isFinite(orderQty[it.id]) ? orderQty[it.id] : '',
               }));
@@ -481,6 +482,7 @@ export default function SuppliesPage() {
                   category: 'Custom Orders',
                   name: req.name.trim(),
                   sku: 'CUSTOM',
+                  par: null,
                   on_hand: typeof req.onHand === 'number' ? req.onHand : '',
                   order_qty: typeof req.orderQty === 'number' ? req.orderQty : '',
                 }));
