@@ -14,9 +14,10 @@ interface CustomRequest {
 interface Item { 
   id: number; 
   name: string; 
-  sku: string; 
+  sku: string | null; 
   category?: string; 
   image_path?: string; 
+  par?: number | null;
 }
 
 export default function SuppliesPage() {
@@ -43,7 +44,7 @@ export default function SuppliesPage() {
     // Load items for the selected site from Supabase via app_site_items join
     supabase
       .from('app_site_items')
-      .select('app_items ( id, name, sku, category ), image_path')
+      .select('app_items ( id, name, sku, category ), image_path, par')
       .eq('site_id', siteId)
       .then((r) => {
         if (r.error) {
@@ -56,7 +57,8 @@ export default function SuppliesPage() {
         console.log('[SuppliesPage] Raw item join rows', rows.slice(0, 5));
         const list: Item[] = rows.map((row) => ({
           ...row.app_items,
-          image_path: row.image_path
+          image_path: row.image_path,
+          par: row.par
         })).filter(Boolean);
         console.log('[SuppliesPage] Items derived', list.length, list.slice(0,5));
         // Sort categories: Consumables, Supply, Equipment
@@ -72,6 +74,7 @@ export default function SuppliesPage() {
   }, [siteId]);
 
   const siteItems = items || [];
+  const isSimonPppoSite = siteName === 'SIMON-PPPO';
   const grouped = useMemo(() => {
     const g: Record<string, Item[]> = { consumables: [], supply: [], equipment: [] };
     for (const it of siteItems) {
@@ -173,6 +176,7 @@ export default function SuppliesPage() {
                   <th className="text-left px-4 py-2 border-b">{t('image')}</th>
                   <th className="text-left px-4 py-2 border-b">{t('item')}</th>
                   <th className="text-left px-4 py-2 border-b">{t('sku')}</th>
+                  {isSimonPppoSite && <th className="text-center px-4 py-2 border-b">PAR</th>}
                   <th className="text-left px-4 py-2 border-b">{t('on hand')}</th>
                   <th className="text-left px-4 py-2 border-b">{t('order qty')}</th>
                 </tr>
@@ -193,7 +197,12 @@ export default function SuppliesPage() {
                       />
                     </td>
                     <td className="px-4 py-2 border-b">{row.name}</td>
-                    <td className="px-4 py-2 border-b font-mono">{row.sku}</td>
+                    <td className="px-4 py-2 border-b font-mono">{row.sku || '-'}</td>
+                    {isSimonPppoSite && (
+                      <td className="px-4 py-2 border-b text-center">
+                        <span className="text-gray-600">{row.par ?? '-'}</span>
+                      </td>
+                    )}
                     <td className="px-4 py-2 border-b">
                       <input
                         type="number"
@@ -245,7 +254,12 @@ export default function SuppliesPage() {
                 {/* Item Name */}
                 <div className="text-center">
                   <h3 className="font-medium text-gray-900">{row.name}</h3>
-                  <p className="text-sm text-gray-500 font-mono">{row.sku}</p>
+                  <p className="text-sm text-gray-500 font-mono">{row.sku || '-'}</p>
+                  {isSimonPppoSite && (
+                    <p className="text-sm text-gray-600 mt-1">
+                      <span className="font-medium">PAR:</span> {row.par ?? '-'}
+                    </p>
+                  )}
                 </div>
                 
                 {/* Input Fields */}
@@ -307,21 +321,21 @@ export default function SuppliesPage() {
 
         {customRequests.length === 0 && (
           <p className="text-gray-500 text-center py-4">{t('no custom requests')}</p>
-        )}
+      )}
 
         {/* Desktop Custom Requests Table */}
         {customRequests.length > 0 && (
           <div className="hidden md:block overflow-x-auto">
-            <table className="min-w-full border border-gray-200 bg-white rounded">
-              <thead className="bg-gray-50">
-                <tr>
+          <table className="min-w-full border border-gray-200 bg-white rounded">
+            <thead className="bg-gray-50">
+              <tr>
                   <th className="text-left px-4 py-2 border-b">{t('item name')}</th>
                   <th className="text-left px-4 py-2 border-b">{t('on hand')}</th>
                   <th className="text-left px-4 py-2 border-b">{t('order qty')}</th>
                   <th className="text-left px-4 py-2 border-b">{t('actions')}</th>
-                </tr>
-              </thead>
-              <tbody>
+              </tr>
+            </thead>
+            <tbody>
                 {customRequests.map((req) => (
                   <tr key={req.id} className="odd:bg-white even:bg-gray-50">
                     <td className="px-4 py-2 border-b">
@@ -334,25 +348,25 @@ export default function SuppliesPage() {
                       />
                     </td>
                     <td className="px-4 py-2 border-b">
-                      <input
-                        type="number"
-                        min={0}
-                        className="w-24 border rounded px-2 py-1"
+                        <input
+                          type="number"
+                          min={0}
+                          className="w-24 border rounded px-2 py-1"
                         value={req.onHand}
-                        onChange={(e) => {
-                          const n = parseNum(e.target.value);
+                          onChange={(e) => {
+                            const n = parseNum(e.target.value);
                           updateCustomRequest(req.id, 'onHand', Number.isNaN(n) ? '' : n);
-                        }}
-                      />
+                          }}
+                        />
                     </td>
                     <td className="px-4 py-2 border-b">
-                      <input
-                        type="number"
-                        min={0}
-                        className="w-24 border rounded px-2 py-1"
+                        <input
+                          type="number"
+                          min={0}
+                          className="w-24 border rounded px-2 py-1"
                         value={req.orderQty}
-                        onChange={(e) => {
-                          const n = parseNum(e.target.value);
+                          onChange={(e) => {
+                            const n = parseNum(e.target.value);
                           updateCustomRequest(req.id, 'orderQty', Number.isNaN(n) ? '' : n);
                         }}
                       />
@@ -369,10 +383,10 @@ export default function SuppliesPage() {
                     </td>
                   </tr>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
         {/* Mobile Custom Requests Cards */}
         {customRequests.length > 0 && (
@@ -484,7 +498,7 @@ export default function SuppliesPage() {
               const ws = XLSX.utils.aoa_to_sheet([
                 ...header,
                 ...tableHeader,
-                ...allRows.map((r) => [r.category, r.name, r.sku, r.on_hand, r.order_qty]),
+                ...allRows.map((r) => [r.category, r.name, r.sku || '', r.on_hand, r.order_qty]),
               ]);
               const wb = XLSX.utils.book_new();
               XLSX.utils.book_append_sheet(wb, ws, 'Request');
@@ -498,7 +512,13 @@ export default function SuppliesPage() {
                 throw new Error('Supabase configuration missing');
               }
               
-              const emailResponse = await fetch(`${supabaseUrl}/functions/v1/send-supply-request`, {
+              // Use PDF function for SIMON-PPPO site, Excel for all others
+              const isSimonPppo = siteName === 'SIMON-PPPO';
+              const functionName = isSimonPppo ? 'send-simon-pppo-pdf' : 'send-supply-request';
+              
+              console.log(`[SubmitRequest] Using ${functionName} function for site: ${siteName}`);
+              
+              const emailResponse = await fetch(`${supabaseUrl}/functions/v1/${functionName}`, {
                 method: 'POST',
                 headers: { 
                   'Content-Type': 'application/json',

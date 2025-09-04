@@ -7,6 +7,7 @@ interface ImportRow {
   itemSku: string;
   itemName: string;
   type: string;
+  par?: number | null;
   rowNumber: number;
 }
 
@@ -39,6 +40,8 @@ export default function BulkImportModal({ isOpen, onClose, onImport, siteName }:
   const [step, setStep] = React.useState<'upload' | 'preview' | 'images'>('upload');
   const [imageFiles, setImageFiles] = React.useState<ImageFile[]>([]);
   const [imageErrors, setImageErrors] = React.useState<string[]>([]);
+  const [processingFile, setProcessingFile] = React.useState(false);
+  const [processingImages, setProcessingImages] = React.useState(false);
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const imageInputRef = React.useRef<HTMLInputElement>(null);
@@ -51,6 +54,8 @@ export default function BulkImportModal({ isOpen, onClose, onImport, siteName }:
     setImporting(false);
     setImageFiles([]);
     setImageErrors([]);
+    setProcessingFile(false);
+    setProcessingImages(false);
   };
 
   const handleClose = () => {
@@ -95,13 +100,17 @@ export default function BulkImportModal({ isOpen, onClose, onImport, siteName }:
           // Skip empty rows and header row
           const dataRows = jsonData.slice(1).filter(row => row.some(cell => cell !== undefined && cell !== ''));
           
-          const parsed: ImportRow[] = dataRows.map((row, index) => ({
-            siteLocation: String(row[0] || '').trim(),
-            itemSku: String(row[1] || '').trim(),
-            itemName: String(row[2] || '').trim(),
-            type: String(row[3] || '').trim().toLowerCase(),
-            rowNumber: index + 2 // +2 because we skipped header and arrays are 0-indexed
-          }));
+          const parsed: ImportRow[] = dataRows.map((row, index) => {
+            const parValue = row[4] !== undefined && row[4] !== '' ? parseInt(String(row[4]), 10) : null;
+            return {
+              siteLocation: String(row[0] || '').trim(),
+              itemSku: String(row[1] || '').trim(),
+              itemName: String(row[2] || '').trim(),
+              type: String(row[3] || '').trim().toLowerCase(),
+              par: Number.isNaN(parValue) ? null : parValue,
+              rowNumber: index + 2 // +2 because we skipped header and arrays are 0-indexed
+            };
+          });
           
           resolve(parsed);
         } catch (error) {
@@ -124,6 +133,8 @@ export default function BulkImportModal({ isOpen, onClose, onImport, siteName }:
   const validateData = (data: ImportRow[]): ValidationError[] => {
     const validationErrors: ValidationError[] = [];
     const validTypes = ['consumable', 'supply', 'equipment'];
+    const isSimonPppo = siteName === 'SIMON-PPPO';
+    const seenSkuNameCombos = new Set<string>();
     
     data.forEach((row) => {
       // Check required fields
@@ -135,12 +146,21 @@ export default function BulkImportModal({ isOpen, onClose, onImport, siteName }:
         });
       }
       
-      if (!row.itemSku) {
-        validationErrors.push({
-          rowNumber: row.rowNumber,
-          field: 'Item SKU',
-          message: 'Item SKU is required'
-        });
+      // Check for duplicate SKU+name combinations within the import file
+      if (row.itemName && row.itemName.trim()) {
+        const sku = row.itemSku ? row.itemSku.trim() : null;
+        const name = row.itemName.trim();
+        const comboKey = sku ? `${sku.toLowerCase()}|${name}` : `null|${name}`;
+        
+        if (seenSkuNameCombos.has(comboKey)) {
+          validationErrors.push({
+            rowNumber: row.rowNumber,
+            field: 'SKU+Name combination',
+            message: `Duplicate SKU+name combination found: "${sku || '(no SKU)'}" + "${name}"`
+          });
+        } else {
+          seenSkuNameCombos.add(comboKey);
+        }
       }
       
       if (!row.itemName) {
@@ -163,6 +183,17 @@ export default function BulkImportModal({ isOpen, onClose, onImport, siteName }:
           field: 'Type',
           message: `Type must be one of: ${validTypes.join(', ')}`
         });
+      }
+      
+      // For SIMON-PPPO site, PAR is optional but must be valid if provided
+      if (isSimonPppo && row.par !== null && row.par !== undefined) {
+        if (row.par < 0) {
+          validationErrors.push({
+            rowNumber: row.rowNumber,
+            field: 'PAR',
+            message: 'PAR must be a positive integer when provided'
+          });
+        }
       }
       
       // Validate site name matches if importing to existing site
@@ -190,6 +221,7 @@ export default function BulkImportModal({ isOpen, onClose, onImport, siteName }:
     
     setFile(selectedFile);
     setErrors([]);
+    setProcessingFile(true);
     
     try {
       const parsed = await parseFile(selectedFile);
@@ -204,6 +236,8 @@ export default function BulkImportModal({ isOpen, onClose, onImport, siteName }:
         field: 'File',
         message: error.message
       }]);
+    } finally {
+      setProcessingFile(false);
     }
   };
 
@@ -212,8 +246,13 @@ export default function BulkImportModal({ isOpen, onClose, onImport, siteName }:
     return filename.replace(/\.(jpg|jpeg|png|webp)$/i, '');
   };
 
-  const handleImageSelect = (selectedFiles: FileList) => {
+  const handleImageSelect = async (selectedFiles: FileList) => {
     setImageErrors([]);
+    setProcessingImages(true);
+    
+    // Small delay to show loading state
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     const newImages: ImageFile[] = [];
     const errors: string[] = [];
     
@@ -253,6 +292,7 @@ export default function BulkImportModal({ isOpen, onClose, onImport, siteName }:
     
     setImageFiles(prev => [...prev, ...newImages]);
     setImageErrors(errors);
+    setProcessingImages(false);
   };
 
   const removeImage = (index: number) => {
@@ -282,7 +322,7 @@ export default function BulkImportModal({ isOpen, onClose, onImport, siteName }:
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
+      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden relative">
         <div className="p-6 border-b">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold">{t('bulk import items')}</h2>
@@ -305,17 +345,19 @@ export default function BulkImportModal({ isOpen, onClose, onImport, siteName }:
                 <div className="text-sm text-blue-800 space-y-2">
                   <p>{t('excel format description')}</p>
                   <div className="bg-white border border-blue-200 rounded p-3 font-mono text-xs">
-                    <div className="grid grid-cols-4 gap-4 font-semibold border-b pb-1">
+                    <div className={`grid gap-4 font-semibold border-b pb-1 ${siteName === 'SIMON-PPPO' ? 'grid-cols-5' : 'grid-cols-4'}`}>
                       <div>Column A: Site Location</div>
-                      <div>Column B: Item SKU</div>
+                      <div>Column B: Item SKU (optional)</div>
                       <div>Column C: Item Name</div>
                       <div>Column D: Type</div>
+                      {siteName === 'SIMON-PPPO' && <div>Column E: PAR (optional)</div>}
                     </div>
-                    <div className="grid grid-cols-4 gap-4 pt-1 text-gray-600">
+                    <div className={`grid gap-4 pt-1 text-gray-600 ${siteName === 'SIMON-PPPO' ? 'grid-cols-5' : 'grid-cols-4'}`}>
                       <div>Main Campus</div>
                       <div>ABC123</div>
                       <div>Paper Towels</div>
                       <div>consumable</div>
+                      {siteName === 'SIMON-PPPO' && <div>10</div>}
                     </div>
                   </div>
                   <div className="space-y-1">
@@ -329,6 +371,9 @@ export default function BulkImportModal({ isOpen, onClose, onImport, siteName }:
                   {siteName && (
                     <div className="bg-yellow-50 border border-yellow-200 rounded p-3">
                       <p><strong>{t('note')}:</strong> {t('site validation message', { siteName })}</p>
+                      {siteName === 'SIMON-PPPO' && (
+                        <p className="mt-2"><strong>PAR Column:</strong> For SIMON-PPPO site, Column E (PAR) is optional. When provided, it must contain positive integers representing the par level for each item.</p>
+                      )}
                     </div>
                   )}
                 </div>
@@ -350,9 +395,16 @@ export default function BulkImportModal({ isOpen, onClose, onImport, siteName }:
                     />
                     <button
                       onClick={() => fileInputRef.current?.click()}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                      disabled={processingFile}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300 flex items-center gap-2"
                     >
-                      {t('choose file')}
+                      {processingFile && (
+                        <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      )}
+                      {processingFile ? t('processing') : t('choose file')}
                     </button>
                     <p className="text-sm text-gray-500 mt-2">
                       {t('supported formats')}: .xlsx, .xls, .csv
@@ -430,6 +482,11 @@ export default function BulkImportModal({ isOpen, onClose, onImport, siteName }:
                         <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                           {t('type')}
                         </th>
+                        {siteName === 'SIMON-PPPO' && (
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                            PAR
+                          </th>
+                        )}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
@@ -444,7 +501,7 @@ export default function BulkImportModal({ isOpen, onClose, onImport, siteName }:
                               {row.siteLocation}
                             </td>
                             <td className="px-4 py-2 text-sm font-mono">
-                              {row.itemSku}
+                              {row.itemSku || '-'}
                             </td>
                             <td className="px-4 py-2 text-sm">
                               {row.itemName}
@@ -459,6 +516,11 @@ export default function BulkImportModal({ isOpen, onClose, onImport, siteName }:
                                 {row.type}
                               </span>
                             </td>
+                            {siteName === 'SIMON-PPPO' && (
+                              <td className="px-4 py-2 text-sm">
+                                {row.par ?? '-'}
+                              </td>
+                            )}
                           </tr>
                         );
                       })}
@@ -514,9 +576,16 @@ export default function BulkImportModal({ isOpen, onClose, onImport, siteName }:
                     />
                     <button
                       onClick={() => imageInputRef.current?.click()}
-                      className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                      disabled={processingImages}
+                      className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-green-300 flex items-center gap-2"
                     >
-                      {t('add images')}
+                      {processingImages && (
+                        <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      )}
+                      {processingImages ? t('processing') : t('add images')}
                     </button>
                     <p className="text-sm text-gray-500 mt-2">
                       {t('click to select multiple images')}
@@ -601,7 +670,8 @@ export default function BulkImportModal({ isOpen, onClose, onImport, siteName }:
         <div className="p-6 border-t bg-gray-50 flex justify-end space-x-3">
           <button
             onClick={handleClose}
-            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+            disabled={importing || processingFile || processingImages}
+            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400"
           >
             {t('cancel')}
           </button>
@@ -609,14 +679,20 @@ export default function BulkImportModal({ isOpen, onClose, onImport, siteName }:
             <>
               <button
                 onClick={() => handleImport()}
-                disabled={errors.length > 0}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 disabled:bg-gray-100"
+                disabled={errors.length > 0 || importing}
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 disabled:bg-gray-100 flex items-center gap-2"
               >
-                {t('skip images import only items')}
+                {importing && (
+                  <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                )}
+                {importing ? t('importing') : t('skip images import only items')}
               </button>
               <button
                 onClick={proceedToImages}
-                disabled={errors.length > 0}
+                disabled={errors.length > 0 || importing}
                 className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-green-300"
               >
                 {t('next add images')}
@@ -627,12 +703,32 @@ export default function BulkImportModal({ isOpen, onClose, onImport, siteName }:
             <button
               onClick={handleImport}
               disabled={importing}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300"
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300 flex items-center gap-2"
             >
+              {importing && (
+                <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              )}
               {importing ? t('importing') : t('import items and images')}
             </button>
           )}
         </div>
+
+        {/* Loading Overlay */}
+        {(importing) && (
+          <div className="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-10">
+            <div className="text-center">
+              <svg className="animate-spin h-8 w-8 mx-auto mb-4 text-blue-600" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <p className="text-lg font-medium text-gray-900">{t('importing')}</p>
+              <p className="text-sm text-gray-600">{t('please wait while we process your data')}</p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
