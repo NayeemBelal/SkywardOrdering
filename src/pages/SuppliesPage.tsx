@@ -18,6 +18,7 @@ interface Item {
   category?: string; 
   image_path?: string; 
   par?: number | null;
+  ntx?: boolean;
 }
 
 export default function SuppliesPage() {
@@ -44,7 +45,7 @@ export default function SuppliesPage() {
     // Load items for the selected site from Supabase via app_site_items join
     supabase
       .from('app_site_items')
-      .select('app_items ( id, name, sku, category ), image_path, par')
+      .select('app_items ( id, name, sku, category ), image_path, par, ntx')
       .eq('site_id', siteId)
       .then((r) => {
         if (r.error) {
@@ -58,7 +59,8 @@ export default function SuppliesPage() {
         const list: Item[] = rows.map((row) => ({
           ...row.app_items,
           image_path: row.image_path,
-          par: row.par
+          par: row.par,
+          ntx: row.ntx
         })).filter(Boolean);
         console.log('[SuppliesPage] Items derived', list.length, list.slice(0,5));
         // Sort categories: Consumables, Supply, Equipment
@@ -471,6 +473,7 @@ export default function SuppliesPage() {
                 name: it.name,
                 sku: it.sku,
                 par: it.par,
+                ntx_tax: it.ntx ? 'NTX' : '',
                 on_hand: Number.isFinite(onHand[it.id]) ? onHand[it.id] : '',
                 order_qty: Number.isFinite(orderQty[it.id]) ? orderQty[it.id] : '',
               }));
@@ -483,6 +486,7 @@ export default function SuppliesPage() {
                   name: req.name.trim(),
                   sku: 'CUSTOM',
                   par: null,
+                  ntx_tax: '', // Custom orders default to blank (taxable)
                   on_hand: typeof req.onHand === 'number' ? req.onHand : '',
                   order_qty: typeof req.orderQty === 'number' ? req.orderQty : '',
                 }));
@@ -496,11 +500,11 @@ export default function SuppliesPage() {
                 ['Submitted', new Date().toISOString()],
                 [],
               ];
-              const tableHeader = [['Category', 'Item', 'SKU', 'On hand', 'Order qty']];
+              const tableHeader = [['Category', 'Item', 'SKU', 'NTX/TAX', 'On hand', 'Order qty']];
               const ws = XLSX.utils.aoa_to_sheet([
                 ...header,
                 ...tableHeader,
-                ...allRows.map((r) => [r.category, r.name, r.sku || '', r.on_hand, r.order_qty]),
+                ...allRows.map((r) => [r.category, r.name, r.sku || '', r.ntx_tax, r.on_hand, r.order_qty]),
               ]);
               const wb = XLSX.utils.book_new();
               XLSX.utils.book_append_sheet(wb, ws, 'Request');

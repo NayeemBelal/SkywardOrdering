@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import BulkImportModal from './BulkImportModal';
 
 type Employee = { id: number; full_name: string };
-type Item = { id: number; name: string; sku: string | null; category?: 'consumables' | 'supply' | 'equipment'; par?: number | null };
+type Item = { id: number; name: string; sku: string | null; category?: 'consumables' | 'supply' | 'equipment'; par?: number | null; ntx?: boolean };
 type Site = { id: number; name: string };
 
 export default function SiteDetail() {
@@ -28,6 +28,13 @@ export default function SiteDetail() {
   const [uploadingImage, setUploadingImage] = React.useState(false);
   const [showBulkImport, setShowBulkImport] = React.useState(false);
   const [newItemPar, setNewItemPar] = React.useState<string>('');
+  const [editingItem, setEditingItem] = React.useState<number | null>(null);
+  const [editForm, setEditForm] = React.useState<{
+    name: string;
+    sku: string;
+    category: 'consumables' | 'supply' | 'equipment';
+    ntx: boolean;
+  }>({ name: '', sku: '', category: 'supply', ntx: false });
 
   React.useEffect(() => {
     let mounted = true;
@@ -36,14 +43,14 @@ export default function SiteDetail() {
         const [{ data: s }, { data: empRows }, { data: itemRows }] = await Promise.all([
           supabase.from('app_sites').select('id,name').eq('id', sid).single(),
           supabase.from('app_site_employees').select('app_employees ( id, full_name )').eq('site_id', sid),
-          supabase.from('app_site_items').select('app_items ( id, name, sku, category ), par').eq('site_id', sid),
+          supabase.from('app_site_items').select('app_items ( id, name, sku, category ), par, ntx').eq('site_id', sid),
         ]);
         if (!mounted) return;
         setSite(s as Site);
         setEmployees(((empRows || []) as any[]).map(r => r.app_employees).filter(Boolean));
         // Sort by category order and then by name
         const order: Record<string, number> = { consumables: 0, supply: 1, equipment: 2 };
-        const arr = ((itemRows || []) as any[]).map(r => ({ ...r.app_items, par: r.par })).filter(Boolean) as any[];
+        const arr = ((itemRows || []) as any[]).map(r => ({ ...r.app_items, par: r.par, ntx: r.ntx })).filter(Boolean) as any[];
         arr.sort((a, b) => {
           const ca = order[String(a.category || 'supply')];
           const cb = order[String(b.category || 'supply')];
@@ -187,6 +194,85 @@ export default function SiteDetail() {
       setError(error.message || 'Failed to add item');
     } finally {
       setUploadingImage(false);
+    }
+  }
+
+  function startEdit(item: Item) {
+    setEditingItem(item.id);
+    setEditForm({
+      name: item.name,
+      sku: item.sku || '',
+      category: item.category || 'supply',
+      ntx: item.ntx || false
+    });
+  }
+
+  function cancelEdit() {
+    setEditingItem(null);
+    setEditForm({ name: '', sku: '', category: 'supply', ntx: false });
+  }
+
+  async function saveEdit(itemId: number) {
+    try {
+      const { error } = await supabase
+        .from('app_items')
+        .update({
+          name: editForm.name,
+          sku: editForm.sku || null,
+          category: editForm.category
+        })
+        .eq('id', itemId);
+
+      if (error) {
+        setError(`Failed to update item: ${error.message}`);
+        return;
+      }
+
+      // Update NTX status in app_site_items
+      const { error: ntxError } = await supabase
+        .from('app_site_items')
+        .update({ ntx: editForm.ntx })
+        .eq('site_id', sid)
+        .eq('item_id', itemId);
+
+      if (ntxError) {
+        setError(`Failed to update NTX status: ${ntxError.message}`);
+        return;
+      }
+
+      // Update the UI
+      setItems(prev => prev.map(i => 
+        i.id === itemId 
+          ? { ...i, name: editForm.name, sku: editForm.sku || null, category: editForm.category, ntx: editForm.ntx }
+          : i
+      ));
+
+      setEditingItem(null);
+      setEditForm({ name: '', sku: '', category: 'supply', ntx: false });
+    } catch (error: any) {
+      setError(`Failed to save changes: ${error.message}`);
+    }
+  }
+
+  async function toggleNtx(itemId: number, currentNtx: boolean) {
+    try {
+      const { error } = await supabase
+        .from('app_site_items')
+        .update({ ntx: !currentNtx })
+        .eq('site_id', sid)
+        .eq('item_id', itemId);
+      
+      if (error) {
+        setError(`Failed to update NTX status: ${error.message}`);
+        return;
+      }
+      
+      // Update the UI
+      setItems(prev => prev.map(i => 
+        i.id === itemId ? { ...i, ntx: !currentNtx } : i
+      ));
+    } catch (error: any) {
+      setError(`Failed to update NTX status: ${error.message}`);
     }
   }
 
@@ -415,11 +501,11 @@ export default function SiteDetail() {
       // Refresh items list
       const { data: itemRows } = await supabase
         .from('app_site_items')
-        .select('app_items ( id, name, sku, category ), par')
+        .select('app_items ( id, name, sku, category ), par, ntx')
         .eq('site_id', sid);
         
       const order: Record<string, number> = { consumables: 0, supply: 1, equipment: 2 };
-      const arr = ((itemRows || []) as any[]).map(r => ({ ...r.app_items, par: r.par })).filter(Boolean) as any[];
+      const arr = ((itemRows || []) as any[]).map(r => ({ ...r.app_items, par: r.par, ntx: r.ntx })).filter(Boolean) as any[];
       arr.sort((a, b) => {
         const ca = order[String(a.category || 'supply')];
         const cb = order[String(b.category || 'supply')];
@@ -569,34 +655,120 @@ export default function SiteDetail() {
                 <th className="px-4 py-2 text-left font-medium">SKU</th>
                 {site?.name === 'SIMON-PPPO' && <th className="px-4 py-2 text-center font-medium">PAR</th>}
                 <th className="px-4 py-2 text-left font-medium">{t('type')}</th>
+                <th className="px-4 py-2 text-center font-medium">NTX</th>
                 <th className="px-4 py-2 text-right font-medium">{t('actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y">
               {items.map(i => (
                 <tr key={i.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2">{i.name}</td>
-                  <td className="px-4 py-2 text-gray-600 font-mono">{i.sku || '-'}</td>
+                  <td className="px-4 py-2">
+                    {editingItem === i.id ? (
+                      <input
+                        type="text"
+                        value={editForm.name}
+                        onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                    ) : (
+                      i.name
+                    )}
+                  </td>
+                  <td className="px-4 py-2 text-gray-600 font-mono">
+                    {editingItem === i.id ? (
+                      <input
+                        type="text"
+                        value={editForm.sku}
+                        onChange={(e) => setEditForm(prev => ({ ...prev, sku: e.target.value }))}
+                        className="w-full border rounded px-2 py-1 text-sm font-mono"
+                        placeholder="SKU"
+                      />
+                    ) : (
+                      i.sku || '-'
+                    )}
+                  </td>
                   {site?.name === 'SIMON-PPPO' && (
                     <td className="px-4 py-2 text-center text-gray-600">{i.par ?? '-'}</td>
                   )}
                   <td className="px-4 py-2">
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      (i.category || 'supply') === 'consumables' ? 'bg-rose-100 text-rose-700' :
-                      (i.category || 'supply') === 'equipment' ? 'bg-emerald-100 text-emerald-700' :
-                      'bg-blue-100 text-blue-700'
-                    }`}>
-                      {t(i.category || 'supply')}
-                    </span>
+                    {editingItem === i.id ? (
+                      <select
+                        value={editForm.category}
+                        onChange={(e) => setEditForm(prev => ({ ...prev, category: e.target.value as 'consumables' | 'supply' | 'equipment' }))}
+                        className="border rounded px-2 py-1 text-sm"
+                      >
+                        <option value="consumables">{t('consumables')}</option>
+                        <option value="supply">{t('supply')}</option>
+                        <option value="equipment">{t('equipment')}</option>
+                      </select>
+                    ) : (
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        (i.category || 'supply') === 'consumables' ? 'bg-rose-100 text-rose-700' :
+                        (i.category || 'supply') === 'equipment' ? 'bg-emerald-100 text-emerald-700' :
+                        'bg-blue-100 text-blue-700'
+                      }`}>
+                        {t(i.category || 'supply')}
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-2 text-center">
+                    {editingItem === i.id ? (
+                      <button
+                        onClick={() => setEditForm(prev => ({ ...prev, ntx: !prev.ntx }))}
+                        className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                          editForm.ntx 
+                            ? 'bg-green-100 text-green-700 hover:bg-green-200' 
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                      >
+                        {editForm.ntx ? 'NTX' : 'Tax'}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => toggleNtx(i.id, i.ntx || false)}
+                        className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                          i.ntx 
+                            ? 'bg-green-100 text-green-700 hover:bg-green-200' 
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                      >
+                        {i.ntx ? 'NTX' : 'Tax'}
+                      </button>
+                    )}
                   </td>
                   <td className="px-4 py-2 text-right">
-                    <button onClick={()=>removeItem(i.id)} className="px-2 py-1 border rounded">{t('remove')}</button>
+                    {editingItem === i.id ? (
+                      <div className="flex gap-1">
+                        <button
+                          onClick={() => saveEdit(i.id)}
+                          className="px-2 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700"
+                        >
+                          ✓
+                        </button>
+                        <button
+                          onClick={cancelEdit}
+                          className="px-2 py-1 bg-gray-600 text-white rounded text-xs hover:bg-gray-700"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex gap-1">
+                        <button
+                          onClick={() => startEdit(i)}
+                          className="px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700"
+                        >
+                          ✏️
+                        </button>
+                        <button onClick={()=>removeItem(i.id)} className="px-2 py-1 border rounded text-xs">{t('remove')}</button>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
               {items.length === 0 && (
                 <tr>
-                  <td colSpan={site?.name === 'SIMON-PPPO' ? 5 : 4} className="px-4 py-6 text-center text-gray-500">{t('no supplies found')}</td>
+                  <td colSpan={site?.name === 'SIMON-PPPO' ? 6 : 5} className="px-4 py-6 text-center text-gray-500">{t('no supplies found')}</td>
                 </tr>
               )}
             </tbody>

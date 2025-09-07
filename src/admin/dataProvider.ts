@@ -73,9 +73,15 @@ const provider: DataProvider = {
   },
   update: async (resource, params) => {
     if (isCompositeResource(resource)) {
-      // Not supported: composite key immutable; return existing
-      const { data } = await provider.getOne(resource, { id: params.id, meta: undefined } as any);
-      return { data };
+      const { site_id, second_id } = parseCompositeId(resource, params.id);
+      const secondKey = compositeResources[resource].secondKey;
+      const { data } = await table(resource)
+        .update(params.data as any)
+        .eq('site_id', site_id)
+        .eq(secondKey, second_id)
+        .select('*')
+        .single();
+      return { data: withCompositeId(resource, data) };
     }
     const { data } = await table(resource)
       .update(params.data as any)
