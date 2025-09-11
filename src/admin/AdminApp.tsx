@@ -10,14 +10,7 @@ export default function AdminApp() {
   const navigate = useNavigate();
   const [overlay, setOverlay] = React.useState(false);
   return (
-    <div className="mx-auto max-w-5xl">
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-semibold">{t('admin')}</h1>
-        <div className="flex gap-2">
-          <Link to="/request" className="px-3 py-1 border rounded">{t('back to request')}</Link>
-          <button onClick={() => navigate('/admin')} className="px-3 py-1 border rounded">{t('dashboard')}</button>
-        </div>
-      </div>
+    <div className="min-h-screen">
       {overlay && (
         <div className="loading-overlay"><div className="spinner" /></div>
       )}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useTranslation } from 'react-i18next';
 import BulkImportModal from './BulkImportModal';
@@ -256,9 +256,33 @@ export default function AddSite() {
   };
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <h2 className="text-xl font-semibold">{t('add site')}</h2>
-      {error && <div className="text-red-600">{error}</div>}
+    <div className="min-h-screen bg-gray-50">
+      {/* Full-width Navigation Bar */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Link 
+                to="/admin" 
+                className="inline-flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-all duration-200"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+              </Link>
+              <div>
+                <h1 className="text-2xl font-light text-gray-900">{t('add site')}</h1>
+                <p className="mt-1 text-sm text-gray-500">Create a new site with employees and supplies</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <form onSubmit={onSubmit} className="space-y-6 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          {error && <div className="text-red-600 bg-red-50 border border-red-200 rounded-lg p-4">{error}</div>}
       <div>
         <label className="block text-sm font-medium mb-1">{t('site name')}</label>
         <input value={name} onChange={e=>setName(e.target.value)} className="w-full border p-2 rounded" placeholder="e.g. Main Campus" required />
@@ -407,7 +431,9 @@ export default function AddSite() {
         onImport={handleBulkImport}
         siteName={name.trim() || undefined}
       />
-    </form>
+        </form>
+      </div>
+    </div>
   );
 }
 

@@ -626,28 +626,61 @@ export default function SiteDetail() {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <Link to="/admin" className="text-blue-700">← {t('back')}</Link>
-          <h2 className="text-xl font-semibold">{site?.name || t('site')}</h2>
-        </div>
-        <div className="flex gap-2">
-          <button 
-            onClick={() => setShowBulkImport(true)}
-            className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
-          >
-            📋 {t('bulk import')}
-          </button>
-          <button 
-            onClick={() => setShowPinManagement(true)}
-            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            🔐 Manage PIN
-          </button>
-          <button onClick={deleteSite} className="px-3 py-1 border rounded text-red-700">{t('delete site')}</button>
+    <div className="min-h-screen bg-gray-50">
+      {/* Full-width Navigation Bar */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Link 
+                to="/admin" 
+                className="inline-flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-all duration-200"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+              </Link>
+              <div>
+                <h1 className="text-2xl font-light text-gray-900">{site?.name || t('site')}</h1>
+                <p className="mt-1 text-sm text-gray-500">Manage site employees and supplies</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <button 
+                onClick={() => setShowBulkImport(true)}
+                className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-all duration-200"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                {t('bulk import')}
+              </button>
+              <button 
+                onClick={() => setShowPinManagement(true)}
+                className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-all duration-200"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                Manage PIN
+              </button>
+              <button 
+                onClick={deleteSite} 
+                className="inline-flex items-center px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 text-sm font-medium rounded-lg transition-all duration-200"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                {t('delete site')}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-8">
       {loading && <div className="p-3">{t('loading')}</div>}
       {error && <div className="text-red-600">{error}</div>}
 
@@ -994,6 +1027,8 @@ export default function SiteDetail() {
           </div>
         </div>
       )}
+        </div>
+      </div>
     </div>
   );
 }
