@@ -28,6 +28,14 @@ export default function SiteDetail() {
   const [uploadingImage, setUploadingImage] = React.useState(false);
   const [showBulkImport, setShowBulkImport] = React.useState(false);
   const [newItemPar, setNewItemPar] = React.useState<string>('');
+  
+  // PIN management state
+  const [showPinManagement, setShowPinManagement] = React.useState(false);
+  const [newPin, setNewPin] = React.useState('');
+  const [confirmPin, setConfirmPin] = React.useState('');
+  const [pinError, setPinError] = React.useState('');
+  const [pinLoading, setPinLoading] = React.useState(false);
+  const [generatedPin, setGeneratedPin] = React.useState('');
   const [editingItem, setEditingItem] = React.useState<number | null>(null);
   const [editForm, setEditForm] = React.useState<{
     name: string;
@@ -328,6 +336,96 @@ export default function SiteDetail() {
     }
   }
 
+  // PIN Management Functions
+  const generateRandomPin = async () => {
+    setPinLoading(true);
+    setPinError('');
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('update-site-pin', {
+        body: { siteId: sid, action: 'generate' }
+      });
+      
+      if (error) {
+        setPinError('Failed to generate PIN');
+        return;
+      }
+      
+      if (data?.success) {
+        setGeneratedPin(data.pin);
+        setNewPin(data.pin);
+        setConfirmPin(data.pin);
+        setPinError('');
+      } else {
+        setPinError(data?.error || 'Failed to generate PIN');
+      }
+    } catch (error: any) {
+      setPinError('Failed to generate PIN');
+      console.error('PIN generation error:', error);
+    } finally {
+      setPinLoading(false);
+    }
+  };
+
+  const updateSitePin = async () => {
+    if (newPin.length !== 6 || !/^\d{6}$/.test(newPin)) {
+      setPinError('PIN must be exactly 6 digits');
+      return;
+    }
+
+    if (newPin !== confirmPin) {
+      setPinError('PINs do not match');
+      return;
+    }
+
+    setPinLoading(true);
+    setPinError('');
+
+    try {
+      const { data, error } = await supabase.functions.invoke('update-site-pin', {
+        body: { siteId: sid, pin: newPin, action: 'update' }
+      });
+
+      if (error) {
+        setPinError('Failed to update PIN');
+        return;
+      }
+
+      if (data?.success) {
+        setShowPinManagement(false);
+        setNewPin('');
+        setConfirmPin('');
+        setGeneratedPin('');
+        // Show success message or update UI
+      } else {
+        setPinError(data?.error || 'Failed to update PIN');
+      }
+    } catch (error: any) {
+      setPinError('Failed to update PIN');
+      console.error('PIN update error:', error);
+    } finally {
+      setPinLoading(false);
+    }
+  };
+
+  const closePinManagement = () => {
+    setShowPinManagement(false);
+    setNewPin('');
+    setConfirmPin('');
+    setPinError('');
+    setGeneratedPin('');
+  };
+
+  const handlePinInput = (value: string, isConfirm: boolean = false) => {
+    const digitsOnly = value.replace(/\D/g, '').slice(0, 6);
+    if (isConfirm) {
+      setConfirmPin(digitsOnly);
+    } else {
+      setNewPin(digitsOnly);
+    }
+    setPinError('');
+  };
+
   async function deleteSite() {
     await supabase.from('app_sites').delete().eq('id', sid);
     navigate('/admin');
@@ -540,6 +638,12 @@ export default function SiteDetail() {
             className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
           >
             📋 {t('bulk import')}
+          </button>
+          <button 
+            onClick={() => setShowPinManagement(true)}
+            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            🔐 Manage PIN
           </button>
           <button onClick={deleteSite} className="px-3 py-1 border rounded text-red-700">{t('delete site')}</button>
         </div>
@@ -782,6 +886,114 @@ export default function SiteDetail() {
         onImport={handleBulkImport}
         siteName={site?.name}
       />
+
+      {/* PIN Management Modal */}
+      {showPinManagement && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium">Manage Site PIN</h3>
+              <button
+                onClick={closePinManagement}
+                className="text-gray-400 hover:text-gray-600"
+                disabled={pinLoading}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="text-sm text-gray-600">
+                Set a 6-digit PIN for site: <strong>{site?.name}</strong>
+              </div>
+
+              {generatedPin && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                  <div className="text-sm font-medium text-green-800 mb-1">
+                    Generated PIN:
+                  </div>
+                  <div className="text-xl font-mono text-green-900 tracking-widest">
+                    {generatedPin}
+                  </div>
+                  <div className="text-xs text-green-700 mt-1">
+                    Save this PIN securely. It will be required for site access.
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    New PIN
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={6}
+                    className="w-full text-center text-xl font-mono border border-gray-300 rounded-lg p-3 tracking-widest focus:border-blue-500 focus:outline-none"
+                    placeholder="••••••"
+                    value={newPin}
+                    onChange={(e) => handlePinInput(e.target.value)}
+                    disabled={pinLoading}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Confirm PIN
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={6}
+                    className="w-full text-center text-xl font-mono border border-gray-300 rounded-lg p-3 tracking-widest focus:border-blue-500 focus:outline-none"
+                    placeholder="••••••"
+                    value={confirmPin}
+                    onChange={(e) => handlePinInput(e.target.value, true)}
+                    disabled={pinLoading}
+                  />
+                </div>
+              </div>
+
+              {pinError && (
+                <div className="text-sm text-red-600 text-center">
+                  {pinError}
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                <button
+                  onClick={generateRandomPin}
+                  disabled={pinLoading}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {pinLoading ? 'Generating...' : '🎲 Generate Random'}
+                </button>
+                <button
+                  onClick={updateSitePin}
+                  disabled={newPin.length !== 6 || confirmPin.length !== 6 || newPin !== confirmPin || pinLoading}
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                >
+                  {pinLoading ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Updating...
+                    </div>
+                  ) : (
+                    'Update PIN'
+                  )}
+                </button>
+              </div>
+
+              <div className="text-xs text-gray-500 text-center">
+                Employees will need this PIN to access the site and submit requests.
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

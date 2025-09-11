@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { FEATURES } from '../config/features';
 
 interface Site { id: number; name: string; }
 interface Employee { id: number; full_name: string; }
@@ -9,6 +10,7 @@ interface Employee { id: number; full_name: string; }
 export default function RequestPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation() as { state?: { sessionExpired?: boolean } };
 
   const [sites, setSites] = useState<Site[]>([]);
   const [siteId, setSiteId] = useState<number>();
@@ -22,6 +24,14 @@ export default function RequestPage() {
   const [password, setPassword] = useState<string>('');
   const [authError, setAuthError] = useState<string>('');
   const [authLoading, setAuthLoading] = useState<boolean>(false);
+  // PIN state
+  const [showPinPrompt, setShowPinPrompt] = useState<boolean>(false);
+  const [pin, setPin] = useState<string>('');
+  const [pinError, setPinError] = useState<string>('');
+  const [pinLoading, setPinLoading] = useState<boolean>(false);
+  const [remainingAttempts, setRemainingAttempts] = useState<number>(5);
+  const [isLocked, setIsLocked] = useState<boolean>(false);
+  const [lockTimeRemaining, setLockTimeRemaining] = useState<number>(0);
   // Date/Time input pre-populated with "now"
   const [dateTime, setDateTime] = useState<string>(() => {
     const d = new Date();
@@ -117,7 +127,18 @@ export default function RequestPage() {
   const canSubmit = Boolean(siteId) && Boolean(employeeId);
 
   const submit = async () => {
-    // Navigate to supplies page with selected site and employee in state
+    if (FEATURES.ENABLE_SITE_PINS) {
+      // Show PIN prompt
+      setShowPinPrompt(true);
+      setPinError('');
+      setPin('');
+    } else {
+      // Direct navigation (feature flag disabled)
+      proceedToSupplies();
+    }
+  };
+
+  const proceedToSupplies = () => {
     const site = sites.find(s => s.id === siteId);
     const siteName = site?.name || '';
     navigate('/supplies', {
@@ -128,6 +149,98 @@ export default function RequestPage() {
         employeeName: employees.find(e => e.id === employeeId)?.full_name || ''
       }
     });
+  };
+
+  const validatePin = async () => {
+    if (!pin || pin.length !== 6) {
+      setPinError('PIN must be 6 digits');
+      return;
+    }
+
+    setPinLoading(true);
+    setPinError('');
+
+    try {
+      const { data, error } = await supabase.functions.invoke('validate-site-pin', {
+        body: { siteId, pin }
+      });
+
+      if (error) {
+        console.error('PIN validation error:', error);
+        
+        // Check if it's a service error (5xx) vs validation error (4xx)
+        if (error.status >= 500) {
+          // Service is down - allow fallback access
+          setPinError('Service temporarily unavailable. Proceeding without PIN validation.');
+          setTimeout(() => {
+            setShowPinPrompt(false);
+            proceedToSupplies();
+          }, 2000);
+          return;
+        } else {
+          // Validation error (4xx) - PIN is wrong or other client error
+          setPinError('Invalid PIN. Please try again.');
+          setPin(''); // Clear PIN input
+          return;
+        }
+      }
+
+      if (data?.valid) {
+        // PIN is correct
+        setShowPinPrompt(false);
+        proceedToSupplies();
+      } else {
+        // PIN is incorrect
+        if (data?.locked) {
+          setIsLocked(true);
+          setLockTimeRemaining(data.remainingTime || 60);
+          setPinError(`Too many failed attempts. Try again in ${data.remainingTime || 60} seconds.`);
+          startCountdown(data.remainingTime || 60);
+        } else {
+          setRemainingAttempts(data?.remainingAttempts || 0);
+          setPinError(`Invalid PIN. ${data?.remainingAttempts || 0} attempts remaining.`);
+        }
+        setPin(''); // Clear PIN input
+      }
+    } catch (err) {
+      console.error('PIN validation failed:', err);
+      // Network or parsing error - show error but don't auto-proceed
+      setPinError('Unable to validate PIN. Please try again.');
+      setPin(''); // Clear PIN input
+    } finally {
+      setPinLoading(false);
+    }
+  };
+
+  const startCountdown = (seconds: number) => {
+    const interval = setInterval(() => {
+      setLockTimeRemaining(prev => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setIsLocked(false);
+          setRemainingAttempts(5);
+          setPinError('');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const handlePinInput = (value: string) => {
+    // Only allow digits and max 6 characters
+    const digitsOnly = value.replace(/\D/g, '').slice(0, 6);
+    setPin(digitsOnly);
+    setPinError('');
+  };
+
+  const closePinPrompt = () => {
+    setShowPinPrompt(false);
+    setPin('');
+    setPinError('');
+    setIsLocked(false);
+    setLockTimeRemaining(0);
+    setRemainingAttempts(5);
   };
 
   const login = async () => {
@@ -183,6 +296,19 @@ export default function RequestPage() {
         )}
       </div>
 
+      {/* Session expired notification */}
+      {location.state?.sessionExpired && (
+        <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-4">
+          <div className="flex items-center gap-2 text-orange-800">
+            <span>⏰</span>
+            <div>
+              <div className="font-medium">Session Expired</div>
+              <div className="text-sm">Your session has expired due to inactivity. Please select your site and employee again.</div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <select className="w-full border" value={siteId} onChange={e=>{ setSiteId(Number(e.target.value)); setEmployeeId(undefined); }}>
         <option value="">{t('site')}</option>
         {sites.map(s=> <option key={s.id} value={s.id}>{s.name}</option>)}
@@ -228,6 +354,83 @@ export default function RequestPage() {
                 <button onClick={()=>setShowLogin(false)} className="px-3 py-1 border rounded">{t('cancel')}</button>
                 <button disabled={authLoading} onClick={login} className="px-3 py-1 bg-blue-600 text-white rounded disabled:bg-blue-300">
                   {authLoading ? t('loading') : t('submit')}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PIN prompt modal */}
+      {showPinPrompt && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm mx-4">
+            <div className="text-center mb-4">
+              <h3 className="text-lg font-medium mb-1">Site PIN Required</h3>
+              <p className="text-sm text-gray-600">
+                Enter the 6-digit PIN for {sites.find(s => s.id === siteId)?.name}
+              </p>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="relative">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={6}
+                  className="w-full text-center text-2xl font-mono border-2 border-gray-300 rounded-lg p-3 tracking-widest focus:border-blue-500 focus:outline-none"
+                  placeholder="••••••"
+                  value={pin}
+                  onChange={(e) => handlePinInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && pin.length === 6 && !isLocked && !pinLoading) {
+                      validatePin();
+                    }
+                  }}
+                  disabled={isLocked || pinLoading}
+                />
+              </div>
+
+              {pinError && (
+                <div className="text-sm text-red-600 text-center">
+                  {pinError}
+                </div>
+              )}
+
+              {isLocked && lockTimeRemaining > 0 && (
+                <div className="text-sm text-orange-600 text-center">
+                  Locked for {lockTimeRemaining} seconds
+                </div>
+              )}
+
+              {!isLocked && remainingAttempts < 5 && remainingAttempts > 0 && (
+                <div className="text-sm text-yellow-600 text-center">
+                  {remainingAttempts} attempts remaining
+                </div>
+              )}
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button 
+                  onClick={closePinPrompt} 
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  disabled={pinLoading}
+                >
+                  {t('cancel')}
+                </button>
+                <button 
+                  disabled={pin.length !== 6 || isLocked || pinLoading} 
+                  onClick={validatePin} 
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-700"
+                >
+                  {pinLoading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Verifying...
+                    </div>
+                  ) : (
+                    'Submit'
+                  )}
                 </button>
               </div>
             </div>

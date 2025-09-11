@@ -15,12 +15,57 @@ export default function AddSite() {
   const [saving, setSaving] = React.useState(false);
   const [error, setError] = React.useState('');
   const [showBulkImport, setShowBulkImport] = React.useState(false);
+  
+  // PIN management state
+  const [pin, setPin] = React.useState('');
+  const [confirmPin, setConfirmPin] = React.useState('');
+  const [pinError, setPinError] = React.useState('');
 
   const addSupplyRow = () => setSupplies(prev => [...prev, { name: '', sku: '', category: 'supply' }]);
   const updateSupply = (idx: number, field: 'name' | 'sku' | 'category' | 'image', value: string | File | null) => {
     setSupplies(prev => prev.map((r, i) => i === idx ? { ...r, [field]: value } : r));
   };
   const removeSupply = (idx: number) => setSupplies(prev => prev.filter((_, i) => i !== idx));
+
+  // PIN helper functions
+  const generateRandomPin = () => {
+    const WEAK_PINS = [
+      '000000', '111111', '222222', '333333', '444444', '555555',
+      '666666', '777777', '888888', '999999', '123456', '654321',
+      '012345', '543210', '123123', '456456', '789789'
+    ];
+    
+    let newPin: string;
+    do {
+      newPin = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+    } while (WEAK_PINS.includes(newPin));
+    
+    setPin(newPin);
+    setConfirmPin(newPin);
+    setPinError('');
+  };
+
+  const handlePinInput = (value: string, isConfirm: boolean = false) => {
+    const digitsOnly = value.replace(/\D/g, '').slice(0, 6);
+    if (isConfirm) {
+      setConfirmPin(digitsOnly);
+    } else {
+      setPin(digitsOnly);
+    }
+    setPinError('');
+  };
+
+  const validatePin = (): boolean => {
+    if (!pin || pin.length !== 6) {
+      setPinError('PIN must be exactly 6 digits');
+      return false;
+    }
+    if (pin !== confirmPin) {
+      setPinError('PINs do not match');
+      return false;
+    }
+    return true;
+  };
 
   const handleBulkImport = async (importRows: any[], imageFiles: any[]) => {
     setError('');
@@ -58,6 +103,12 @@ export default function AddSite() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    
+    // Validate PIN first
+    if (!validatePin()) {
+      return;
+    }
+    
     setSaving(true);
     try {
       // 1) Create site (dedupe by normalized name)
@@ -70,14 +121,30 @@ export default function AddSite() {
       let siteId: number;
       if (existing?.id && String(existing.name).trim().toLowerCase() === desiredName.toLowerCase()) {
         siteId = existing.id as number;
+        // Update existing site's PIN
+        const { data: pinResult, error: pinError } = await supabase.functions.invoke('update-site-pin', {
+          body: { siteId, pin, action: 'update' }
+        });
+        if (pinError || !pinResult?.success) {
+          throw new Error(pinResult?.error || 'Failed to set PIN for existing site');
+        }
       } else {
+        // Create new site with default PIN first
         const { data: site, error: siteErr } = await supabase
           .from('app_sites')
-          .insert({ name: desiredName })
+          .insert({ name: desiredName, pin_hash: 'default_000000' })
           .select('id')
           .single();
         if (siteErr) throw siteErr;
         siteId = site!.id as number;
+        
+        // Set the actual PIN using the Edge Function
+        const { data: pinResult, error: pinError } = await supabase.functions.invoke('update-site-pin', {
+          body: { siteId, pin, action: 'update' }
+        });
+        if (pinError || !pinResult?.success) {
+          throw new Error(pinResult?.error || 'Failed to set PIN for new site');
+        }
       }
 
       const siteIdFinal = siteId;
@@ -195,6 +262,66 @@ export default function AddSite() {
       <div>
         <label className="block text-sm font-medium mb-1">{t('site name')}</label>
         <input value={name} onChange={e=>setName(e.target.value)} className="w-full border p-2 rounded" placeholder="e.g. Main Campus" required />
+      </div>
+      
+      {/* Site PIN Section */}
+      <div className="space-y-3 p-4 border border-blue-200 rounded-lg bg-blue-50">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-medium text-blue-900">🔐 Site PIN (Required)</h3>
+          <button
+            type="button"
+            onClick={generateRandomPin}
+            className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+          >
+            🎲 Generate Random
+          </button>
+        </div>
+        <p className="text-xs text-blue-700">
+          This PIN will be required for employees to access this site and submit requests.
+        </p>
+        
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-sm font-medium text-blue-900 mb-1">PIN</label>
+            <input
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={6}
+              className="w-full text-center text-lg font-mono border border-blue-300 rounded p-2 tracking-widest focus:border-blue-500 focus:outline-none"
+              placeholder="••••••"
+              value={pin}
+              onChange={(e) => handlePinInput(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-blue-900 mb-1">Confirm PIN</label>
+            <input
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={6}
+              className="w-full text-center text-lg font-mono border border-blue-300 rounded p-2 tracking-widest focus:border-blue-500 focus:outline-none"
+              placeholder="••••••"
+              value={confirmPin}
+              onChange={(e) => handlePinInput(e.target.value, true)}
+              required
+            />
+          </div>
+        </div>
+        
+        {pinError && (
+          <div className="text-sm text-red-600">
+            {pinError}
+          </div>
+        )}
+        
+        {pin && confirmPin && pin === confirmPin && pin.length === 6 && (
+          <div className="text-sm text-green-600">
+            ✅ PIN is valid and ready to use
+          </div>
+        )}
       </div>
       <div>
         <label className="block text-sm font-medium mb-1">{t('employees one per line')}</label>

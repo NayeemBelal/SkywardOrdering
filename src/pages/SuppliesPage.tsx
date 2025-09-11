@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import * as XLSX from 'xlsx';
 import { useTranslation } from 'react-i18next';
+import { initializeSessionTimeout, stopSessionTimeout } from '../utils/sessionTimeout';
+import { FEATURES } from '../config/features';
 
 interface CustomRequest {
   id: string;
@@ -74,6 +76,31 @@ export default function SuppliesPage() {
         setItems(list);
       });
   }, [siteId]);
+
+  // Initialize session timeout when component mounts
+  useEffect(() => {
+    if (FEATURES.ENABLE_SITE_PINS) {
+      const handleTimeout = () => {
+        // Clear any local state
+        setOnHand({});
+        setOrderQty({});
+        setCustomRequests([]);
+        
+        // Navigate back to request page
+        navigate('/request', { 
+          replace: true,
+          state: { sessionExpired: true }
+        });
+      };
+
+      initializeSessionTimeout(handleTimeout);
+
+      // Cleanup on unmount
+      return () => {
+        stopSessionTimeout();
+      };
+    }
+  }, [navigate]);
 
   const siteItems = items || [];
   const isSimonPppoSite = siteName === 'SIMON-PPPO';
