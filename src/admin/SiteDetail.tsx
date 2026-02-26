@@ -7,6 +7,7 @@ import BulkImportModal from './BulkImportModal';
 type Employee = { id: number; full_name: string };
 type Item = { id: number; name: string; sku: string | null; category?: 'consumables' | 'supply' | 'equipment'; par?: number | null; ntx?: boolean };
 type Site = { id: number; name: string };
+type EmailRecipient = { id: number; email: string; label: string | null };
 
 export default function SiteDetail() {
   const { t } = useTranslation();
@@ -36,6 +37,13 @@ export default function SiteDetail() {
   const [pinError, setPinError] = React.useState('');
   const [pinLoading, setPinLoading] = React.useState(false);
   const [generatedPin, setGeneratedPin] = React.useState('');
+  // Email recipients state
+  const [emailRecipients, setEmailRecipients] = React.useState<EmailRecipient[]>([]);
+  const [newRecipientEmail, setNewRecipientEmail] = React.useState('');
+  const [newRecipientLabel, setNewRecipientLabel] = React.useState('');
+  const [recipientError, setRecipientError] = React.useState('');
+  const [addingRecipient, setAddingRecipient] = React.useState(false);
+
   const [editingItem, setEditingItem] = React.useState<number | null>(null);
   const [editForm, setEditForm] = React.useState<{
     name: string;
@@ -48,14 +56,16 @@ export default function SiteDetail() {
     let mounted = true;
     (async () => {
       try {
-        const [{ data: s }, { data: empRows }, { data: itemRows }] = await Promise.all([
+        const [{ data: s }, { data: empRows }, { data: itemRows }, { data: recipientRows }] = await Promise.all([
           supabase.from('app_sites').select('id,name').eq('id', sid).single(),
           supabase.from('app_site_employees').select('app_employees ( id, full_name )').eq('site_id', sid),
           supabase.from('app_site_items').select('app_items ( id, name, sku, category ), par, ntx').eq('site_id', sid),
+          supabase.from('app_email_recipients').select('id,email,label').eq('site_id', sid).order('created_at'),
         ]);
         if (!mounted) return;
         setSite(s as Site);
         setEmployees(((empRows || []) as any[]).map(r => r.app_employees).filter(Boolean));
+        setEmailRecipients((recipientRows || []) as EmailRecipient[]);
         // Sort by category order and then by name
         const order: Record<string, number> = { consumables: 0, supply: 1, equipment: 2 };
         const arr = ((itemRows || []) as any[]).map(r => ({ ...r.app_items, par: r.par, ntx: r.ntx })).filter(Boolean) as any[];
@@ -425,6 +435,37 @@ export default function SiteDetail() {
     }
     setPinError('');
   };
+
+  async function addEmailRecipient() {
+    const email = newRecipientEmail.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setRecipientError('Please enter a valid email address');
+      return;
+    }
+    setAddingRecipient(true);
+    setRecipientError('');
+    try {
+      const { data, error } = await supabase
+        .from('app_email_recipients')
+        .insert({ site_id: sid, email, label: newRecipientLabel.trim() || null })
+        .select('id,email,label')
+        .single();
+      if (error) throw error;
+      setEmailRecipients(prev => [...prev, data as EmailRecipient]);
+      setNewRecipientEmail('');
+      setNewRecipientLabel('');
+    } catch (e: any) {
+      setRecipientError(e.message?.includes('unique') ? 'This email is already a recipient for this site' : e.message || 'Failed to add recipient');
+    } finally {
+      setAddingRecipient(false);
+    }
+  }
+
+  async function removeEmailRecipient(id: number) {
+    const { error } = await supabase.from('app_email_recipients').delete().eq('id', id);
+    if (error) { setRecipientError(error.message); return; }
+    setEmailRecipients(prev => prev.filter(r => r.id !== id));
+  }
 
   async function deleteSite() {
     await supabase.from('app_sites').delete().eq('id', sid);
@@ -911,6 +952,73 @@ export default function SiteDetail() {
             </tbody>
           </table>
         </div>
+      </section>
+
+      {/* Email Recipients */}
+      <section className="space-y-3 bg-white border rounded-xl shadow-sm p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold">Email Recipients</h3>
+            <p className="text-xs text-gray-500 mt-0.5">
+              {site?.name === 'SIMON-PPPO'
+                ? 'Recipients for SIMON-PPPO order emails. Global recipients are not included for this site.'
+                : 'Site-specific recipients for order emails. Global recipients always receive orders too.'}
+            </p>
+          </div>
+          <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-700 border">{emailRecipients.length}</span>
+        </div>
+
+        {recipientError && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">{recipientError}</div>
+        )}
+
+        <div className="flex gap-2">
+          <input
+            className="border p-2 rounded flex-1 text-sm"
+            placeholder="Email address"
+            value={newRecipientEmail}
+            onChange={e => { setNewRecipientEmail(e.target.value); setRecipientError(''); }}
+            onKeyDown={e => e.key === 'Enter' && addEmailRecipient()}
+          />
+          <input
+            className="border p-2 rounded w-32 text-sm"
+            placeholder="Label (optional)"
+            value={newRecipientLabel}
+            onChange={e => setNewRecipientLabel(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && addEmailRecipient()}
+          />
+          <button
+            onClick={addEmailRecipient}
+            disabled={addingRecipient}
+            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 text-sm"
+          >
+            {addingRecipient ? 'Adding...' : 'Add'}
+          </button>
+        </div>
+
+        <ul className="divide-y rounded-lg border">
+          {emailRecipients.map(r => (
+            <li key={r.id} className="p-2 flex items-center justify-between hover:bg-gray-50">
+              <div>
+                <span className="text-sm">{r.email}</span>
+                {r.label && <span className="ml-2 text-xs text-gray-500">({r.label})</span>}
+              </div>
+              <button
+                onClick={() => removeEmailRecipient(r.id)}
+                className="px-2 py-1 border rounded text-xs text-red-600 hover:bg-red-50 hover:border-red-300"
+              >
+                Remove
+              </button>
+            </li>
+          ))}
+          {emailRecipients.length === 0 && (
+            <li className="p-2 text-sm text-gray-500">
+              {site?.name === 'SIMON-PPPO'
+                ? 'No recipients configured. Orders will use the fallback recipient list.'
+                : 'No site-specific recipients. Orders will go to global recipients only.'}
+            </li>
+          )}
+        </ul>
       </section>
 
       <BulkImportModal

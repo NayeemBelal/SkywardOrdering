@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { useTranslation } from 'react-i18next';
 
 type Site = { id: number; name: string };
+type EmailRecipient = { id: number; email: string; label: string | null };
 
 export default function AdminDashboard() {
   const { t } = useTranslation();
@@ -12,24 +13,67 @@ export default function AdminDashboard() {
   const [error, setError] = React.useState<string>('');
   const [downloading, setDownloading] = React.useState(false);
 
+  const [globalRecipients, setGlobalRecipients] = React.useState<EmailRecipient[]>([]);
+  const [recipientsLoading, setRecipientsLoading] = React.useState(true);
+  const [newRecipientEmail, setNewRecipientEmail] = React.useState('');
+  const [newRecipientLabel, setNewRecipientLabel] = React.useState('');
+  const [recipientError, setRecipientError] = React.useState('');
+  const [addingRecipient, setAddingRecipient] = React.useState(false);
+
   React.useEffect(() => {
     let mounted = true;
     (async () => {
       try {
-        const { data, error } = await supabase.from('app_sites').select('id,name').order('name');
-        if (error) throw error;
+        const [sitesResult, recipientsResult] = await Promise.all([
+          supabase.from('app_sites').select('id,name').order('name', { ascending: true }),
+          supabase.from('app_email_recipients').select('id,email,label').is('site_id', null).order('created_at'),
+        ]);
+        if (sitesResult.error) throw sitesResult.error;
         if (!mounted) return;
-        setSites((data || []) as Site[]);
+        setSites((sitesResult.data || []) as Site[]);
+        setGlobalRecipients((recipientsResult.data || []) as EmailRecipient[]);
       } catch (e: any) {
-        setError(e.message || 'Failed to load sites');
+        setError(e.message || 'Failed to load data');
       } finally {
         setLoading(false);
+        setRecipientsLoading(false);
       }
     })();
     return () => {
       mounted = false;
     };
   }, []);
+
+  async function addGlobalRecipient() {
+    const email = newRecipientEmail.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setRecipientError('Please enter a valid email address');
+      return;
+    }
+    setAddingRecipient(true);
+    setRecipientError('');
+    try {
+      const { data, error } = await supabase
+        .from('app_email_recipients')
+        .insert({ site_id: null, email, label: newRecipientLabel.trim() || null })
+        .select('id,email,label')
+        .single();
+      if (error) throw error;
+      setGlobalRecipients(prev => [...prev, data as EmailRecipient]);
+      setNewRecipientEmail('');
+      setNewRecipientLabel('');
+    } catch (e: any) {
+      setRecipientError(e.message?.includes('unique') ? 'This email is already a global recipient' : e.message || 'Failed to add recipient');
+    } finally {
+      setAddingRecipient(false);
+    }
+  }
+
+  async function removeGlobalRecipient(id: number) {
+    const { error } = await supabase.from('app_email_recipients').delete().eq('id', id);
+    if (error) { setRecipientError(error.message); return; }
+    setGlobalRecipients(prev => prev.filter(r => r.id !== id));
+  }
 
   const handleDownloadSupplyRequests = async () => {
     setDownloading(true);
@@ -222,6 +266,80 @@ export default function AdminDashboard() {
               </div>
             </div>
         </div>
+
+          {/* Global Recipients */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 mt-8">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900">Global Email Recipients</h3>
+                  <p className="text-sm text-gray-500 mt-1">These recipients receive every order from every site</p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                  <span className="text-sm text-gray-500">{globalRecipients.length} recipients</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {recipientError && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">{recipientError}</div>
+              )}
+
+              {/* Add form */}
+              <div className="flex gap-2">
+                <input
+                  className="border rounded-lg px-3 py-2 text-sm flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Email address"
+                  value={newRecipientEmail}
+                  onChange={e => { setNewRecipientEmail(e.target.value); setRecipientError(''); }}
+                  onKeyDown={e => e.key === 'Enter' && addGlobalRecipient()}
+                />
+                <input
+                  className="border rounded-lg px-3 py-2 text-sm w-36 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Label (optional)"
+                  value={newRecipientLabel}
+                  onChange={e => setNewRecipientLabel(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && addGlobalRecipient()}
+                />
+                <button
+                  onClick={addGlobalRecipient}
+                  disabled={addingRecipient}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg disabled:opacity-50 transition-colors"
+                >
+                  {addingRecipient ? 'Adding...' : 'Add'}
+                </button>
+              </div>
+
+              {/* Recipients list */}
+              {recipientsLoading ? (
+                <div className="flex items-center py-4">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-2"></div>
+                  <span className="text-sm text-gray-500">Loading...</span>
+                </div>
+              ) : globalRecipients.length === 0 ? (
+                <p className="text-sm text-gray-500 py-2">No global recipients configured.</p>
+              ) : (
+                <ul className="divide-y rounded-lg border">
+                  {globalRecipients.map(r => (
+                    <li key={r.id} className="flex items-center justify-between px-4 py-2 hover:bg-gray-50">
+                      <div>
+                        <span className="text-sm text-gray-900">{r.email}</span>
+                        {r.label && <span className="ml-2 text-xs text-gray-500">({r.label})</span>}
+                      </div>
+                      <button
+                        onClick={() => removeGlobalRecipient(r.id)}
+                        className="text-sm text-red-600 hover:text-red-800 px-2 py-1 rounded hover:bg-red-50 transition-colors"
+                      >
+                        Remove
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
       </div>
     </div>
   );

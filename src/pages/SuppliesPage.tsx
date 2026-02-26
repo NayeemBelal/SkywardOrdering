@@ -545,7 +545,7 @@ export default function SuppliesPage() {
                 throw new Error('Supabase configuration missing');
               }
               
-              // Use PDF function for SIMON-PPPO site, Excel for all others
+              // Use PDF function for SIMON-PPPO site, standard function for all others
               const isSimonPppo = siteName === 'SIMON-PPPO';
               const functionName = isSimonPppo ? 'send-simon-pppo-pdf' : 'send-supply-request';
               
@@ -558,6 +558,7 @@ export default function SuppliesPage() {
                   'Authorization': `Bearer ${supabaseAnonKey}`
                 },
                 body: JSON.stringify({
+                  siteId,
                   siteName,
                   employeeName,
                   items: allRows
